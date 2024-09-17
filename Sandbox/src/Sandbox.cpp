@@ -1,4 +1,4 @@
-#include <spindle.h>
+#include <Spindle/Spindle.h>
 
 class Sandbox : public Spindle::Application
 {
@@ -16,6 +16,6 @@ public:
 
 Spindle::Application* Spindle::CreateApplication()
 {
-	SPINDLE_INFO("Sandbox application started.");
+	SPINDLE_INFO("Sandbox application created.");
 	return new Sandbox();
 }

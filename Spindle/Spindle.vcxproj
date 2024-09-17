@@ -11,15 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Log.h" />
-    <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\Spindle.h" />
-    <ClInclude Include="src\Core.h" />
-    <ClInclude Include="src\EntryPoint.h" />
+    <ClInclude Include="src\Spindle\Log.h" />
+    <ClInclude Include="src\Spindle\Application.h" />
+    <ClInclude Include="src\Spindle\Spindle.h" />
+    <ClInclude Include="src\Spindle\Core.h" />
+    <ClInclude Include="src\Spindle\EntryPoint.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Log.cpp" />
-    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\Spindle\Log.cpp" />
+    <ClCompile Include="src\Spindle\Application.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
