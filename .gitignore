@@ -70,7 +70,7 @@ ipch/
 *.VC.opendb
 
 # External dependencies
-Engine/vendor/
+Spindle/vendor/
 
 # Submodule files
 .gitmodules
@@ -183,5 +183,7 @@ Sandbox/bin-int/
 
 .vs/
 
-docs/
+# documentation
+docs/private/
+docs/.history/
 
