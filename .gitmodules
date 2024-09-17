@@ -1,0 +1,3 @@
+[submodule "Spindle/vendor/spdlog"]
+	path = Spindle/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git

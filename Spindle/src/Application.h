@@ -4,12 +4,12 @@
 
 namespace Spindle {
     class SPINDLE_API Application {
-    public:
-        Application();
-        virtual ~Application();
+        public:
+            Application();
+            virtual ~Application();
 
-        void Run();
-    };
+            void Run();
+        };
 
     // To be defined in CLIENT
     Application* CreateApplication();

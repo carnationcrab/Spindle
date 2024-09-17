@@ -69,9 +69,6 @@ ipch/
 *.VC.db
 *.VC.opendb
 
-# External dependencies
-Spindle/vendor/
-
 # Submodule files
 .gitmodules
 
