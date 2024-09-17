@@ -1,0 +1,187 @@
+# Build results
+[Bb]uild/
+[Bb]in/
+[Oo]bj/
+*.exe
+*.dll
+*.lib
+*.app
+*.log
+*.pdb
+*.cache
+*.ilk
+*.ipdb
+*.iobj
+*.obj
+*.pch
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.vspscc
+*.vssscc
+
+# Visual Studio files
+*.suo
+*.user
+*.sln.docstates
+*.vcxproj.user
+*.vcxproj.filters
+*.vcxproj.ide.*
+
+# Visual Studio Code files
+.vscode/
+
+# Visual Studio cache files
+.vs/
+
+# NuGet Packages
+*.nupkg
+packages/
+.nuget/
+
+# Backup & Report files from converting an old project file
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+
+# LightSwitch build output
+*.HTMLClient/GeneratedArtifacts
+*.DesktopClient/GeneratedArtifacts
+*.DesktopClient/ModelManifest.xml
+*.Server/GeneratedArtifacts
+*.Server/ModelManifest.xml
+*.Server/bin
+*.Server/obj
+
+# Other files
+*.opensdf
+*.sdf
+ipch/
+*.ipch
+*.dbmdl
+*.VC.db
+*.VC.opendb
+
+# External dependencies
+Engine/vendor/
+
+# Submodule files
+.gitmodules
+
+# TeamCity
+_TeamCity*
+
+# Resharper
+*.ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# StyleCop
+StyleCopReport.xml
+StyleCopCache.cache
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_i.h
+*.idb
+*.class
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+
+# Node.js files
+node_modules/
+
+# Office Add-in files
+*.manifest.cache
+
+# Python files (if applicable)
+__pycache__/
+*.pyc
+
+# Mac files
+*.DS_Store
+
+# Thumbnail cache files
+[Tt]humbs.db
+
+# Build directories
+x64/
+x86/
+ARM/
+ARM64/
+
+# Logs
+*.log
+
+# Deployment files
+*.deploy.cmd
+*.deploy-readme.txt
+*.deployment
+
+# Publish profiles
+*.pubxml
+*.publishproj
+
+# Visual Studio temporary files
+~$*
+
+# Precompiled headers
+*.gch
+
+# Compiled source files
+*.o
+
+# Compiled dynamic libraries
+*.so
+
+# Compiled static libraries
+*.a
+
+# Other
+*.orig
+*.bak
+*.old
+*.tmp
+
+# CMake files (if you're using CMake)
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Engine-specific
+bin/
+bin-int/
+Sandbox/bin/
+Sandbox/bin-int/
+
+.vs/
+
+docs/
+
