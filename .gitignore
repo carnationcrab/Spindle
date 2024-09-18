@@ -33,6 +33,8 @@
 *.vcxproj.user
 *.vcxproj.filters
 *.vcxproj.ide.*
+*.vcxproj
+*.sln
 
 # Visual Studio Code files
 .vscode/
