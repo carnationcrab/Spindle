@@ -16,13 +16,13 @@ project "Spindle"
     language "C++"
 
     targetdir("bin/" .. outputdir .. "/%{prj.name}")
-    targetdir("bin-int/" .. outputdir .. "/%{prj.name}")
+    objdir("bin-int/" .. outputdir .. "/%{prj.name}")
 
 
     files
     {
-        "/%{prj.name}/src/**.h",
-        "/%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp"
     }
 
     includedirs
@@ -33,7 +33,7 @@ project "Spindle"
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
-        systemversion "10.0 (latest installed version)"
+        systemversion  "latest"
 
         defines
         {
@@ -43,11 +43,10 @@ project "Spindle"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+            "{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox"
         }
 
     -- optimization goes on for real time testing but logging is on for debug
-
     filter "configurations:Debug"
         defines "SPINDLE_DEBUG"
         symbols "On"
@@ -70,18 +69,18 @@ project "Sandbox"
     language "C++"
 
     targetdir("bin/" .. outputdir .. "/%{prj.name}")
-    targetdir("bin-int/" .. outputdir .. "/%{prj.name}")
+    objdir("bin-int/" .. outputdir .. "/%{prj.name}")
 
 
     files
     {
-        "/%{prj.name}/src/**.h",
-        "/%{prj.name}/src/**.cpp"
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp"
     }
 
     includedirs
     {
-        "%{prj.name}/vendor/spdlog/include",
+        "Spindle/vendor/spdlog/include",
         "Spindle/src"
     }
 
@@ -93,7 +92,7 @@ project "Sandbox"
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
-        systemversion "10.0 (latest installed version)"
+        systemversion "latest"
 
         defines
         {
