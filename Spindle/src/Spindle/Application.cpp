@@ -7,7 +7,7 @@ namespace Spindle {
 
     void Application::Run() {
         while (true) {
-            // Main loop
+            // TODO replace with loop
         }
     }
 }

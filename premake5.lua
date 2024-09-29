@@ -32,13 +32,14 @@ project "Spindle"
 
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
+        staticruntime "On" -- turn off if there are issues
         systemversion  "latest"
 
         defines
         {
             "SPINDLE_PLATFORM_WINDOWS",
-            "SPINDLE_BUILD_DLL"
+            "SPINDLE_BUILD_DLL",
+            "SPINDLE_DLL_EXPORTS"
         }
 
         postbuildcommands
