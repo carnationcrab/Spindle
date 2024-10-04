@@ -8,7 +8,7 @@ public:
 
 	}
 
-	~Sandbox()
+	virtual ~Sandbox()
 	{
 
 	}
@@ -17,5 +17,7 @@ public:
 Spindle::Application* Spindle::CreateApplication()
 {
 	SPINDLE_INFO("Sandbox application created.");
+
+	// no memory leak because destroyed on program end
 	return new Sandbox();
 }
