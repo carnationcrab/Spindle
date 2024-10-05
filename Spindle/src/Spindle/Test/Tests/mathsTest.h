@@ -1,15 +1,14 @@
 #pragma once
 
-#include <iostream>
 #include "../../Math/Vector.h"
+#include "test.h"
 
 namespace Spindle {
-    class mathsTest {
+    class mathsTest : test {
     public:
         void testBaseMaths();
         void testVector2();
         void testVector3();
-
-        void runAllTests();
+        void RunAllTests() override;
     };
 }

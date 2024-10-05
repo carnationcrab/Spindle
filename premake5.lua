@@ -4,6 +4,7 @@ workspace "Spindle"
     configurations
     {
         "Debug",
+        "Test",
         "Release",
         "Dist"
     }
@@ -51,6 +52,12 @@ project "Spindle"
     filter "configurations:Debug"
         defines "SPINDLE_DEBUG"
         symbols "On"
+        optimize "Off"
+
+    filter "configurations:Test"
+        defines "SPINDLE_TEST"
+        symbols "On"
+        optimize "Off"
 
     filter "configurations:Release"
         defines "SPINDLE_RELEASE"
@@ -104,6 +111,10 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "SPINDLE_DEBUG"
+        symbols "On"
+
+    filter "configurations:Test"
+        defines "SPINDLE_TEST"
         symbols "On"
 
     filter "configurations:Release"

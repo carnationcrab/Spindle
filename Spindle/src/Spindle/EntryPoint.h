@@ -11,9 +11,15 @@ int main(int argc, char** argv)
 	SPINDLE_CORE_WARN("Log Initialized.");
 	SPINDLE_INFO("Spinning up Spindle...");
 
-	Spindle::Application* app = Spindle::CreateApplication();
-	app->Run();
-	delete app;
+	#ifdef SPINDLE_TEST
+		SPINDLE_CORE_WARN("Initializing in TEST MODE...");
+		Spindle::Tester::RunAllTests();
+	#else
+		SPINDLE_CORE_WARN("Initializing in Production Mode...");
+		Spindle::Application* app = Spindle::CreateApplication();
+		app->Run();
+		delete app;
+	#endif
 
 	return 0;
 }

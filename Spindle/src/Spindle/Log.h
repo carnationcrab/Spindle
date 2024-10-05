@@ -14,10 +14,14 @@ namespace Spindle {
 
             inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return spindleCoreLogger; }
             inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return spindleClientLogger; }
+            inline static std::shared_ptr<spdlog::logger>& GetTestLogger() { return spindleTestLogger; }
+
 
         private:
             static std::shared_ptr<spdlog::logger> spindleCoreLogger;
             static std::shared_ptr<spdlog::logger> spindleClientLogger;
+            static std::shared_ptr<spdlog::logger> spindleTestLogger;
+
         };
 
 }
@@ -35,3 +39,9 @@ namespace Spindle {
 #define SPINDLE_WARN(...)          ::Spindle::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define SPINDLE_ERROR(...)         ::Spindle::Log::GetClientLogger()->error(__VA_ARGS__)
 #define SPINDLE_FATAL(...)         ::Spindle::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+// Test log macros
+#define SPINDLE_TEST_PASS(...)    ::Spindle::Log::GetTestLogger()->info(__VA_ARGS__)
+#define SPINDLE_TEST_INFO(...)    ::Spindle::Log::GetTestLogger()->trace(__VA_ARGS__)
+#define SPINDLE_TEST_FAIL(...)    ::Spindle::Log::GetTestLogger()->error(__VA_ARGS__)
+

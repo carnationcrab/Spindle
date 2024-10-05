@@ -1,11 +1,12 @@
 #pragma once
 
+#include "../Core.h"
+
 namespace Spindle {
-	class tester
-	{
+	
+	class SPINDLE_API Tester {
 	public:
-		void runMathsTests();
-		void runAllTests();
+	    static void RunAllTests();
 	};
 
 }
