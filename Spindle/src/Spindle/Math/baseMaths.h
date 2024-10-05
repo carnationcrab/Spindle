@@ -26,9 +26,9 @@ namespace Spindle {
     }
 
     // float abs
-    //#undef FABS
+    #undef FABS
     template <typename T>
-    constexpr T ABS(const T a) {
+    constexpr T FABS(const T a) {
         return std::fabs(a);
     }
     
