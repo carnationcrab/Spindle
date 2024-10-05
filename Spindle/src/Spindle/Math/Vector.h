@@ -4,7 +4,6 @@
 #include "baseMaths.h"
 
 #include <iostream>
-#include <cmath> // Include cmath for std::sqrt and std::fabs
 
 namespace Spindle {
     template <typename T>
