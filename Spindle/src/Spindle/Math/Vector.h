@@ -16,7 +16,7 @@ namespace Spindle {
 
         // magnitude
         T magnitude() const {
-            return MAGN(x, y); // Correct magnitude calculation
+            return MAGN(x, y);
         }
 
         // magnitude squared
@@ -41,11 +41,11 @@ namespace Spindle {
 
         // dot product
         float dot(const Vector2& operand) const {
-            return x * operand.x + y * operand.y; // Ensure correct dot product calculation
+            return x * operand.x + y * operand.y;
         }
 
-        // Epsilon for floating-point comparison
-        const T EPSILON = 1e-6; // Adjust as necessary
+        // epsilon (for floating-point comparison)
+        const T EPSILON = 1e-6;
 
         // (a * b) = ab
         bool isCollinear(const Vector2& operand) const {
@@ -91,12 +91,12 @@ namespace Spindle {
 
         // magnitude
         T magnitude() const {
-            return MAGN(x,y,z); // Correct magnitude calculation
+            return MAGN(x, y, z);
         }
 
         // magnitude squared
         T magnitudeSquared() const {
-            return x * x + y * y + z * z; // Correct calculation
+            return x * x + y * y + z * z:
         }
 
         // addition
@@ -110,11 +110,11 @@ namespace Spindle {
         }
 
         float dot(const Vector3& operand) const {
-            return x * operand.x + y * operand.y + z * operand.z; // Ensure correct dot product calculation
+            return x * operand.x + y * operand.y + z * operand.z;
         }
 
-        // Epsilon for floating-point comparison
-        const T EPSILON = 1e-6; // Adjust as necessary
+        // epsilon (for floating-point comparison)
+        const T EPSILON = 1e-6;
 
         // (a * b) = ab
         bool isCollinear(const Vector3& operand) const {
