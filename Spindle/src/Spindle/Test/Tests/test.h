@@ -4,11 +4,11 @@
 namespace Spindle {
     class test {
     public:
-        virtual void runAllTests() = 0;
+        virtual void RunAllTests() = 0;
 
     // protected:
         bool isPass(float expected, float actual) {
-            return std::abs(expected - actual) < 0.001; // Tolerance for floating-point comparison
+            return std::abs(expected - actual) < 0.001; // Floating point tolerance
         }
 
         void runTest(float expected, float actual, const std::string& description) {

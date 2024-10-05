@@ -85,7 +85,7 @@ namespace Spindle {
     }
 
     // Run all tests
-    void mathsTest::runAllTests() {
+    void mathsTest::RunAllTests() {
         testBaseMaths();
         testVector2();
         testVector3();

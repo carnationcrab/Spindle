@@ -1,22 +1,18 @@
-#include "tester.h"
+#include "Tester.h"
 #include "Tests/mathsTest.h"
 #include "../Log.h"
 
 namespace Spindle {
 
-	void tester::runMathsTests() {
-		SPINDLE_TEST_INFO("[tester] Starting maths tests...");
-		
-		mathsTest mathsTests;
-		mathsTests.runAllTests();
-
-		SPINDLE_TEST_INFO("[tester] Finished maths tests.");
-	}
-
-	void tester::runAllTests() {
-		SPINDLE_TEST_INFO("[tester] Starting all tests tests...");
+	void Tester::RunAllTests() {
+		SPINDLE_TEST_INFO("[Tester] Starting all tests...");
 		// run maths tests
-		runMathsTests();
+		SPINDLE_TEST_INFO("[Tester] Starting maths tests...");
+
+		mathsTest mathsTests;
+		mathsTests.RunAllTests();
+
+		SPINDLE_TEST_INFO("[Tester] Finished maths tests.");
 	}
 
 }

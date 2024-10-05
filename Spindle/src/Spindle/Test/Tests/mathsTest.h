@@ -9,7 +9,6 @@ namespace Spindle {
         void testBaseMaths();
         void testVector2();
         void testVector3();
-        void runAllTests() override;
-
+        void RunAllTests() override;
     };
 }

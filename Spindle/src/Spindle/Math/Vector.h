@@ -50,19 +50,19 @@ namespace Spindle {
         // (a * b) = ab
         bool isCollinear(const Vector2& operand) const {
             T dotProduct = this->dot(operand);
-            return std::fabs(dotProduct * dotProduct - (this->magnitudeSquared() * operand.magnitudeSquared())) < EPSILON;
+            return FABS(dotProduct * dotProduct - (this->magnitudeSquared() * operand.magnitudeSquared())) < EPSILON;
         }
 
         // (a * b) = -ab
         bool isCollinearButOpposite(const Vector2& operand) const {
             T dotProduct = this->dot(operand);
-            return std::fabs(dotProduct * dotProduct + (this->magnitudeSquared() * operand.magnitudeSquared())) < EPSILON;
+            return FABS(dotProduct * dotProduct + (this->magnitudeSquared() * operand.magnitudeSquared())) < EPSILON;
         }
 
         // (a * b) = 0
         bool isPerpendicular(const Vector2& operand) const {
             T dotProduct = this->dot(operand);
-            return std::fabs(dotProduct) < EPSILON;
+            return FABS(dotProduct) < EPSILON;
         }
 
         // (a * b) > 0
@@ -131,7 +131,7 @@ namespace Spindle {
         // (a * b) = 0
         bool isPerpendicular(const Vector3& operand) const {
             T dotProduct = this->dot(operand);
-            return std::fabs(dotProduct) < EPSILON;
+            return FABS(dotProduct) < EPSILON;
         }
 
         // (a * b) > 0
