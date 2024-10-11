@@ -1,6 +1,7 @@
 #pragma once
 #include "Test/TestFramework.h"
 #include "Test/Vector2Tests.cpp"
+#include "Test/Vector3Tests.cpp"
 
 #ifdef SPINDLE_PLATFORM_WINDOWS
 
