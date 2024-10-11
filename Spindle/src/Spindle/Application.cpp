@@ -10,6 +10,7 @@ namespace Spindle {
     Application::~Application() {}
 
     void Application::Run() {
+        // some temp code for testing
         Vector2<float> v1{ 3.0f, 4.0f };
         Vector2<float> v2{ -1.0f, 2.0f };
         Vector2<float> v3{ 0.0f, 0.0f };
