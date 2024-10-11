@@ -136,25 +136,33 @@ namespace Spindle {
 
         // addition (SIMD)
         Vector3 operator+(const Vector3<float>& operand) const noexcept {
-            __m128 a = SSE_Set(x, y, z, 0.0f);
-            __m128 b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
+            __m128      a = SSE_Set(x, y, z, 0.0f);
+            __m128      b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
             __m128 result = SSE_Add(a, b);
+            
             return Vector3(SSE_GetX(result), SSE_GetY(result), _mm_cvtss_f32(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2))));
         }
 
         // subtraction (SIMD)
         Vector3 operator-(const Vector3<float>& operand) const noexcept {
-            __m128 a = SSE_Set(x, y, z, 0.0f);
-            __m128 b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
+            __m128      a = SSE_Set(x, y, z, 0.0f);
+            __m128      b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
             __m128 result = SSE_Subtract(a, b);
-            return Vector3(SSE_GetX(result), SSE_GetY(result), _mm_cvtss_f32(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2))));
+            
+            return Vector3(
+                SSE_GetX(result),
+                SSE_GetY(result),
+                _mm_cvtss_f32(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2))));
         }
 
         // multiplication by a scalar (SIMD)
         Vector3 operator*(float scalar) const noexcept {
             __m128 a = SSE_Set(x, y, z, 0.0f);
             __m128 result = SSE_MultiplyScalar(a, scalar);
-            return Vector3(SSE_GetX(result), SSE_GetY(result), _mm_cvtss_f32(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2))));
+            return Vector3(
+                SSE_GetX(result),
+                SSE_GetY(result),
+                _mm_cvtss_f32(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2))));
         }
 
         // normalized vector, unit vector
@@ -230,7 +238,10 @@ namespace Spindle {
 
         // "(x, y, z)"
         std::string toString() const noexcept {
-            return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
+            return "(" + 
+                std::to_string(x) + ", "
+              + std::to_string(y) + ", " 
+              + std::to_string(z) + ")";
         }
 
         // getters

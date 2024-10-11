@@ -1,4 +1,3 @@
-// Vector3Tests.cpp
 #include "TestFramework.h"
 #include "../Math/Vector3.h"
 
