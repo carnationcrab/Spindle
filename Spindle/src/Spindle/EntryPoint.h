@@ -1,4 +1,7 @@
 #pragma once
+#include "Test/TestFramework.h"
+#include "Test/Vector2Tests.cpp"
+#include "Test/Vector3Tests.cpp"
 
 #ifdef SPINDLE_PLATFORM_WINDOWS
 
@@ -13,7 +16,7 @@ int main(int argc, char** argv)
 
 	#ifdef SPINDLE_TEST
 		SPINDLE_CORE_WARN("Initializing in TEST MODE...");
-		Spindle::Tester::RunAllTests();
+		RUN_ALL_TESTS();
 	#else
 		SPINDLE_CORE_WARN("Initializing in Production Mode...");
 		Spindle::Application* app = Spindle::CreateApplication();

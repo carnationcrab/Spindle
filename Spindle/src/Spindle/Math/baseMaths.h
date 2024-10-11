@@ -4,7 +4,6 @@
 #include <cassert>
 #include <optional>
 
-
 //_ BASIC MATHS FNS _____________
 
 namespace Spindle {
@@ -71,5 +70,13 @@ namespace Spindle {
     template <typename T>
     constexpr T MAGN(const T x, const T y, const T z) {
         return SQRT(x * x + y * y + z * z);
-    }  
+    }
+
+    constexpr float EPSILON{ 1e-5 };
+
+    template <typename T>
+    constexpr bool sEpsilon(const T value) {
+        return FABS(value) < EPSILON;
+    }
 }
+
