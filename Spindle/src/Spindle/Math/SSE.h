@@ -3,6 +3,8 @@
 #include <xmmintrin.h>
 #include <pmmintrin.h> // for horizontal add
 
+// overcommented for my own learning purposes, sorry readers.
+
 namespace Spindle {
 
     // initializes an __m128 variable with the four
@@ -58,13 +60,25 @@ namespace Spindle {
     }
 
     // vector multiplication in parallel
-    inline __m128 SSE_MultiplyScalar(__m128 vec, float scalar) noexcept {
+    inline __m128 SSE_Multiply(__m128 vec, float scalar) noexcept {
         __m128 scalarVec = _mm_set1_ps(scalar);           // Broadcast scalar across all SIMD lanes
         return _mm_mul_ps(vec, scalarVec);                // Perform SIMD multiplication
     }
 
     inline __m128 SSE_Multiply(__m128 a, __m128 b) noexcept {
         return _mm_mul_ps(a, b);
+    }
+
+    inline __m128 SSE_CmpOrd(__m128 a) noexcept {
+        return _mm_cmpord_ss(a, a);
+    }
+
+    inline __m128 SSE_CmpOrd(__m128 a, __m128 b) noexcept {
+        return _mm_cmpord_ss(a, b);
+    }
+
+    inline __m128 SSE_(__m128 a, __m128 b) noexcept {
+        return _mm_cmpord_ss(a, b);
     }
 
     // computes the dot product using transposed loading approach
@@ -147,12 +161,13 @@ namespace Spindle {
 
     // todo encapsulate suffle
     inline __m128 SSE_Cross(__m128 a, __m128 b) noexcept {
-        __m128 a_yzx = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
-        __m128 b_yzx = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1));
+        __m128     a_yzx = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
+        __m128     b_yzx = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1));
 
         __m128 crossProd = _mm_sub_ps(SSE_Multiply(a, b_yzx), 
-                    SSE_Multiply(a_yzx, b));
+                                      SSE_Multiply(a_yzx, b));
 
         return _mm_shuffle_ps(crossProd, crossProd, _MM_SHUFFLE(3, 0, 2, 1));;
     }
 }
+

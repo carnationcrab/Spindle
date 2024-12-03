@@ -7,7 +7,7 @@
 #include <cmath>
 #include "../Log.h"
 
-namespace TestFramework {
+namespace SpindleTest {
 
     struct Test {
         std::string name;
@@ -86,9 +86,9 @@ namespace TestFramework {
 #define TEST_CASE(name) \
     bool name(); \
     struct name##_Register { \
-        name##_Register() { TestFramework::TestRunner::getInstance().addTest(#name, name); } \
+        name##_Register() { SpindleTest::TestRunner::getInstance().addTest(#name, name); } \
     } name##_instance; \
     bool name()
 
 #define RUN_ALL_TESTS() \
-    TestFramework::TestRunner::getInstance().runAllTests()
+    SpindleTest::TestRunner::getInstance().runAllTests()
