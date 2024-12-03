@@ -58,13 +58,25 @@ namespace Spindle {
     }
 
     // vector multiplication in parallel
-    inline __m128 SSE_MultiplyScalar(__m128 vec, float scalar) noexcept {
+    inline __m128 SSE_Multiply(__m128 vec, float scalar) noexcept {
         __m128 scalarVec = _mm_set1_ps(scalar);           // Broadcast scalar across all SIMD lanes
         return _mm_mul_ps(vec, scalarVec);                // Perform SIMD multiplication
     }
 
     inline __m128 SSE_Multiply(__m128 a, __m128 b) noexcept {
         return _mm_mul_ps(a, b);
+    }
+
+    inline __m128 SSE_CmpOrd(__m128 a) noexcept {
+        return _mm_cmpord_ss(a, a);
+    }
+
+    inline __m128 SSE_CmpOrd(__m128 a, __m128 b) noexcept {
+        return _mm_cmpord_ss(a, b);
+    }
+
+    inline __m128 SSE_(__m128 a, __m128 b) noexcept {
+        return _mm_cmpord_ss(a, b);
     }
 
     // computes the dot product using transposed loading approach
@@ -156,3 +168,4 @@ namespace Spindle {
         return _mm_shuffle_ps(crossProd, crossProd, _MM_SHUFFLE(3, 0, 2, 1));;
     }
 }
+
