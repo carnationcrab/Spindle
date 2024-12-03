@@ -11,11 +11,11 @@ namespace Spindle {
         // Constructors
         constexpr Point2D() noexcept
             : x{ 0.0f },
-              y{ 0.0f } {}
+            y{ 0.0f } {}
 
         Point2D(float p_x, float p_y)
             : x{ p_x },
-              y{ p_y } {}
+            y{ p_y } {}
 
         // Adding a vector results in a new point
         Point2D operator+(const Vector2<float>& vec) const {
