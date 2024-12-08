@@ -6,6 +6,12 @@
 #include <cmath>
 #include <string>
 
+/**************************
+*                         *
+* Vector (2D)  (2.0,1.0)  *
+*                         *
+**************************/
+
 namespace Spindle {
 
     // all other datatypes use regular math
@@ -45,7 +51,7 @@ namespace Spindle {
                 y * scalar);
         }
 
-        // Collinear test (same direction)
+        // collinear test (same direction)
         bool isCollinear(const Vector2& operand, float epsilon = 1e-5) const noexcept {
             float dotProduct = dot(operand);
             float       magA = magnitude();
@@ -54,7 +60,7 @@ namespace Spindle {
             return std::abs(dotProduct - (magA * magB)) < epsilon;
         }
 
-        // Collinear but opposite
+        // collinear but opposite
         bool isCollinearOpposite(const Vector2& operand, float epsilon = 1e-5) const noexcept {
             float dotProduct = dot(operand);
             float       magA = magnitude();
@@ -63,19 +69,19 @@ namespace Spindle {
             return std::abs(dotProduct + (magA * magB)) < epsilon;
         }
 
-        // Perpendicular test
+        // perpendicular test
         bool isPerpendicular(const Vector2& operand, float epsilon = 1e-5) const noexcept {
             float dotProduct = dot(operand);
 
             return std::abs(dotProduct) < epsilon;
         }
 
-        // Same direction
+        // same direction
         bool isSameDirection(const Vector2& operand) const noexcept {
             return dot(operand) > 0;
         }
 
-        // Opposite direction
+        // opposite direction
         bool isOppositeDirection(const Vector2& operand) const noexcept {
             return dot(operand) < 0;
         }
@@ -100,6 +106,12 @@ namespace Spindle {
     private:
         float x, y;
 
+    /**********************
+    *                     *
+    *    constructors     *
+    *                     *
+    **********************/
+
     public:
         Vector2() noexcept
             : x{ 0.0f }, y{ 0.0f } {}
@@ -107,16 +119,19 @@ namespace Spindle {
         Vector2(float p_x, float p_y) noexcept
             : x{ p_x }, y{ p_y } {}
 
+    /**********************
+    *                     *
+    * operator overloads  *
+    *                     *
+    **********************/
+
         // addition (SIMD)
         Vector2 operator+(const Vector2<float>& operand) const noexcept {
             __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
             __m128      b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
             __m128 result = SSE_Add(a, b);
             
-            return Vector2(
-                SSE_GetX(result), 
-                SSE_GetY(result)
-            );
+            return setVector2(result);
         }
 
         // subtraction (SIMD)
@@ -125,32 +140,29 @@ namespace Spindle {
             __m128      b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
             __m128 result = SSE_Subtract(a, b);
             
-            return Vector2(
-                SSE_GetX(result), 
-                SSE_GetY(result)
-            );
+            return setVector2(result);
         }
 
         // multiplication by a scalar (SIMD)
         Vector2 operator*(float scalar) const noexcept {
             __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 result = SSE_MultiplyScalar(a, scalar);
+            __m128 result = SSE_Multiply(a, scalar);
             
-            return Vector2(
-                SSE_GetX(result), 
-                SSE_GetY(result)
-            );
+            return setVector2(result);
         }
+
+    /**********************
+    *                     *
+    *       methods       *
+    *                     *
+    **********************/
 
         // normalized vector, unit vector
         Vector2 unitVector() const noexcept {
             __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 result = SSE_MultiplyScalar(a, (1 / magnitude()));
+            __m128 result = SSE_Multiply(a, (1 / magnitude()));
 
-            return Vector2(
-                SSE_GetX(result),
-                SSE_GetY(result)
-            );
+            return setVector2(result);
         }
 
         // dot product 
@@ -209,6 +221,19 @@ namespace Spindle {
         // Opposite direction
         bool isOppositeDirection(const Vector2& operand) const noexcept {
             return dot(operand) < 0;
+        }
+
+    /**********************
+    *                     *
+    *      utilities      *
+    *                     *
+    **********************/
+
+        Vector2 setVector2(__m128 result) const noexcept {
+            return Vector2(
+                SSE_GetX(result),
+                SSE_GetY(result)
+            );
         }
 
         std::string toString() const noexcept {
