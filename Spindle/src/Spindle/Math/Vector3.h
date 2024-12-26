@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../Core.h"
-#include "SSE.h"
+#include "SSE/SSE.h"
+#include "AVX/AVX.h"
 
 #include <cmath>
 #include <string>
@@ -161,165 +162,158 @@ namespace Spindle {
     private:
         float x, y, z;
 
-
-    /**********************
-    *                     *
-    *    constructors     *
-    *                     *
-    **********************/
+        /**********************
+        *                     *
+        *    constructors     *
+        *                     *
+        **********************/
 
     public:
         Vector3() noexcept
-            : x{ 0.0f }, 
-              y{ 0.0f }, 
-              z{ 0.0f } {}
+            : x{ 0.0f }, y{ 0.0f }, z{ 0.0f } {}
 
         Vector3(float p_x, float p_y, float p_z) noexcept
-            : x{ p_x },
-              y{ p_y },
-              z{ p_z } {}
+            : x{ p_x }, y{ p_y }, z{ p_z } {}
 
-    /**********************
-    *                     *
-    * operator overloads  *
-    *                     *
-    **********************/
+        /**********************
+        *                     *
+        * operator overloads  *
+        *                     *
+        **********************/
 
-        // addition (SIMD)
+        // addition
         Vector3 operator+(const Vector3<float>& operand) const noexcept {
+#ifdef USE_AVX
+            __m256      a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      b = AVX_Set(operand.x, operand.y, operand.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Add(a, b);
+            return setVector3(result);
+#elif defined(USE_SSE)
             __m128      a = SSE_Set(x, y, z, 0.0f);
             __m128      b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
             __m128 result = SSE_Add(a, b);
-            
-            return Vector3(SSE_GetX(result), SSE_GetY(result), _mm_cvtss_f32(_mm_shuffle_ps(result, result, _MM_SHUFFLE(2, 2, 2, 2))));
+            return setVector3(result);
+#else
+            return Vector3(x + operand.x, y + operand.y, z + operand.z);
+#endif
         }
 
-        // subtraction (SIMD)
+        // subtraction
         Vector3 operator-(const Vector3<float>& operand) const noexcept {
+#ifdef USE_AVX
+            __m256      a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      b = AVX_Set(operand.x, operand.y, operand.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Subtract(a, b);
+            return setVector3(result);
+#elif defined(USE_SSE)
             __m128      a = SSE_Set(x, y, z, 0.0f);
             __m128      b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
             __m128 result = SSE_Subtract(a, b);
-            
-            return Vector3(
-                SSE_GetX(result),
-                SSE_GetY(result),
-                SSE_GetZ(result));
+            return setVector3(result);
+#else
+            return Vector3(x - operand.x, y - operand.y, z - operand.z);
+#endif
         }
 
-        // multiplication by a scalar (SIMD)
+        // multiplication by a scalar
         Vector3 operator*(float scalar) const noexcept {
-            __m128 a = SSE_Set(x, y, z, 0.0f);
+#ifdef USE_AVX
+            __m256      a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Multiply(a, scalar);
+            return setVector3(result);
+#elif defined(USE_SSE)
+            __m128      a = SSE_Set(x, y, z, 0.0f);
             __m128 result = SSE_Multiply(a, scalar);
-            return Vector3(
-                SSE_GetX(result),
-                SSE_GetY(result),
-                SSE_GetZ(result));
+            return setVector3(result);
+#else
+            return Vector3(x * scalar, y * scalar, z * scalar);
+#endif
         }
 
-    /**********************
-    *                     *
-    *       methods       *
-    *                     *
-    **********************/
+        /**********************
+        *                     *
+        *       methods       *
+        *                     *
+        **********************/
 
         // normalized vector, unit vector
         Vector3 unitVector() const noexcept {
-            __m128      a = SSE_Set(x, y, z, 0.0f);
-            __m128 result = SSE_Multiply(a, (1 / magnitude()));
-
+#ifdef USE_AVX
+            __m256      a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Multiply(a, (1.0f / magnitude()));
             return setVector3(result);
+#elif defined(USE_SSE)
+            __m128      a = SSE_Set(x, y, z, 0.0f);
+            __m128 result = SSE_Multiply(a, (1.0f / magnitude()));
+            return setVector3(result);
+#else
+            float mag = magnitude();
+            return Vector3(x / mag, y / mag, z / mag);
+#endif
         }
 
-        // cross product (not SIMD accelerated)
-        Vector3 cross(const Vector3<float>& operand) const noexcept {
-            return Vector3(
-                (y * operand.z) - (z * operand.y),
-                (z * operand.x) - (x * operand.z),
-                (x * operand.y) - (y * operand.x) 
-            );
-        }
-
-        // dot product (SIMD)
+        // dot product
         float dot(const Vector3<float>& operand) const noexcept {
+#ifdef USE_AVX
+            __m256 a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 b = AVX_Set(operand.x, operand.y, operand.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            return AVX_Dot(a, b);
+#elif defined(USE_SSE)
             __m128 a = SSE_Set(x, y, z, 0.0f);
             __m128 b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
-            
             return SSE_Dot(a, b);
+#else
+            return x * operand.x 
+                 + y * operand.y 
+                 + z * operand.z;
+#endif
         }
 
-        // magnitude squared constexpr?
-        float magnitudeSquared() const noexcept { return dot(*this); }
+        // magnitude squared (length squared)
+        float magnitudeSquared() const noexcept {
+            return dot(*this);
+        }
 
-        // magnitude
+        // magnitude (length)
         float magnitude() const noexcept {
             return std::sqrt(magnitudeSquared());
         }
 
-        // Collinear test (same direction)
-        bool isCollinear(const Vector3& operand, float epsilon = 1e-5) const noexcept {
-            float dotProduct = dot(operand);
-            float       magA = magnitude();
-            float       magB = operand.magnitude();
-            
-            return std::abs(dotProduct - (magA * magB)) < epsilon;
-        }
-
-        // Collinear but opposite
-        bool isCollinearOpposite(const Vector3& operand, float epsilon = 1e-5) const noexcept {
-            float dotProduct = dot(operand);
-            float       magA = magnitude();
-            float       magB = operand.magnitude();
-            
-            return std::abs(dotProduct + (magA * magB)) < epsilon;
-        }
-
-        // Perpendicular test
-        bool isPerpendicular(const Vector3& operand, float epsilon = 1e-5) const noexcept {
-            float dotProduct = dot(operand);
-            return std::abs(dotProduct) < epsilon;
-        }
-
-        // Same direction
-        bool isSameDirection(const Vector3& operand) const noexcept {
-            return dot(operand) > 0;
-        }
-
-        // Opposite direction
-        bool isOppositeDirection(const Vector3& operand) const noexcept {
-            return dot(operand) < 0;
-        }
-
-    /**********************
-    *                     *
-    *      utilities      *
-    *                     *
-    **********************/
-
-        // "(x, y, z)"
-        std::string toString() const noexcept {
-            return "(" + 
-                std::to_string(x) + ", "
-              + std::to_string(y) + ", " 
-              + std::to_string(z) + ")";
-        }
-
-
-        Vector3 setVector3(__m128 result) const noexcept {
+        // cross product
+        Vector3 cross(const Vector3<float>& operand) const noexcept {
             return Vector3(
-                SSE_GetX(result),
-                SSE_GetY(result),
-                SSE_GetZ(result)
+                (y * operand.z) - (z * operand.y),
+                (z * operand.x) - (x * operand.z),
+                (x * operand.y) - (y * operand.x)
             );
         }
 
-        // getters
-        float getX()     const noexcept { return x; }
-        void  setX(float newX) noexcept { x = newX; }
+        /**********************
+        *                     *
+        *      utilities      *
+        *                     *
+        **********************/
 
-        float getY()     const noexcept { return y; }
-        void  setY(float newY) noexcept { y = newY; }
-        
-        float getZ()     const noexcept { return z; }
-        void  setZ(float newZ) noexcept { z = newZ; }
+        Vector3 setVector3(__m256 result) const noexcept {
+            return Vector3(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+        }
+
+        Vector3 setVector3(__m128 result) const noexcept {
+            return Vector3(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
+        }
+
+        std::string toString() const noexcept {
+            return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
+        }
+
+        // getters
+        float getX() const noexcept { return x; }
+        void setX(float newX) noexcept { x = newX; }
+
+        float getY() const noexcept { return y; }
+        void setY(float newY) noexcept { y = newY; }
+
+        float getZ() const noexcept { return z; }
+        void setZ(float newZ) noexcept { z = newZ; }
     };
 }
