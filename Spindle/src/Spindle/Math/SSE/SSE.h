@@ -169,5 +169,32 @@ namespace Spindle {
 
         return _mm_shuffle_ps(crossProd, crossProd, _MM_SHUFFLE(3, 0, 2, 1));;
     }
+
+    // Fused multiply-add: (a * b) + c
+    inline __m128 SSE_MultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
+#ifdef __FMA__
+        return _mm_fmadd_ps(a, b, c);  // If FMA is available
+#else
+        return _mm_add_ps(_mm_mul_ps(a, b), c);  // Fall back to separate multiply and add
+#endif
+    }
+
+    // Fused multiply-subtract: (a * b) - c
+    inline __m128 SSE_MultiplySubtract(__m128 a, __m128 b, __m128 c) noexcept {
+#ifdef __FMA__
+        return _mm_fmsub_ps(a, b, c);  // If FMA is available
+#else
+        return _mm_sub_ps(_mm_mul_ps(a, b), c);  // Fall back to separate multiply and subtract
+#endif
+    }
+
+    // Negated fused multiply-add: -(a * b) + c
+    inline __m128 SSE_NegativeMultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
+#ifdef __FMA__
+        return _mm_fnmadd_ps(a, b, c);  // If FMA is available
+#else
+        return _mm_add_ps(_mm_sub_ps(_mm_setzero_ps(), _mm_mul_ps(a, b)), c);
+#endif
+    }
 }
 

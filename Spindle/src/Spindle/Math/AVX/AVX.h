@@ -58,6 +58,33 @@ namespace Spindle {
         return _mm256_mul_ps(vec, scalarVec);
     }
 
+    // Fused multiply-add: (a * b) + c
+    inline __m256 AVX_MultiplyAdd(__m256 a, __m256 b, __m256 c) noexcept {
+#ifdef __FMA__
+        return _mm256_fmadd_ps(a, b, c);  // If FMA is available
+#else
+        return _mm256_add_ps(_mm256_mul_ps(a, b), c);  // Fall back to separate multiply and add
+#endif
+    }
+
+    // Fused multiply-subtract: (a * b) - c
+    inline __m256 AVX_MultiplySubtract(__m256 a, __m256 b, __m256 c) noexcept {
+#ifdef __FMA__
+        return _mm256_fmsub_ps(a, b, c);  // If FMA is available
+#else
+        return _mm256_sub_ps(_mm256_mul_ps(a, b), c);  // Fall back to separate multiply and subtract
+#endif
+    }
+
+    // Negated fused multiply-add: -(a * b) + c
+    inline __m256 AVX_NegativeMultiplyAdd(__m256 a, __m256 b, __m256 c) noexcept {
+#ifdef __FMA__
+        return _mm256_fnmadd_ps(a, b, c);  // If FMA is available
+#else
+        return _mm256_add_ps(_mm256_sub_ps(_mm256_setzero_ps(), _mm256_mul_ps(a, b)), c);
+#endif
+    }
+
     /******************************
     *                             *
     *     AVX Dot Product Ops     *
