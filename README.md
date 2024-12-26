@@ -2,7 +2,8 @@
 
 Currently just a math library. Run in the 'Test' build configuration to see:
 
-![image](https://github.com/user-attachments/assets/bf9b22b8-97b7-46c3-a412-4c19df8844d9)
+![image](https://github.com/user-attachments/assets/d3669dc7-aa3d-43bf-aa36-40fc06c4b1c7)
+
 
 ## Running Spindle (VS 2022):
 
