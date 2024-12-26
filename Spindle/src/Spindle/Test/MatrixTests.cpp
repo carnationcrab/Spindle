@@ -91,12 +91,6 @@ TEST_CASE(Matrix3x3_Transpose) {
 
     Matrix<int, 3, 3> result = mat.transpose();
 
-    for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-            std::cout << "Result(" << i << "," << j << "): " << result.at(i, j) << "\n";
-        }
-    }
-
 
     SpindleTest::assertEqual(result.at(0, 1), 4, "Transpose result at (0,1) should be 4");
     SpindleTest::assertEqual(result.at(2, 0), 3, "Transpose result at (2,0) should be 3");
