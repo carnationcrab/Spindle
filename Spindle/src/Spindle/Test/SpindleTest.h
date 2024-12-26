@@ -110,9 +110,10 @@ namespace SpindleTest {
             size_t total = passed + failed;
             SPINDLE_TEST_INFO("Summary:");
             SPINDLE_TEST_INFO("  Total tests run: {}", total);
-            SPINDLE_TEST_INFO("  Passed: {}", passed);
-            failed > 0 ? SPINDLE_TEST_FAIL("  Failed: {}", failed) :
-                         SPINDLE_TEST_INFO("  Failed: {}", failed);
+            passed == total ? SPINDLE_TEST_PASS("  Passed: {}/{}", passed, total) :
+                              SPINDLE_TEST_INFO("  Passed: {}/{}", passed, total);
+            failed > 0 ? SPINDLE_TEST_FAIL("  Failed: {}/{}", failed, total) :
+                         SPINDLE_TEST_INFO("  Failed: {}/{}", failed, total);
         }
     };
 
