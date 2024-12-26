@@ -10,6 +10,7 @@
 #include "Test/Vector2Tests.cpp"
 #include "Test/Vector3Tests.cpp"
 #include "Test/MatrixTests.cpp"
+#include "Test/QuaternionTests.cpp"
 
 #ifdef SPINDLE_PLATFORM_WINDOWS
 
