@@ -120,7 +120,7 @@ namespace SpindleTest {
     };
 
     // assertions
-    inline void assertInfo(const std::string& message) {=
+    inline void assertInfo(const std::string& message) {
         SPINDLE_TEST_INFO(message);
     }
 
