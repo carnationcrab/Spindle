@@ -16,6 +16,16 @@
 #define USE_SCALAR
 #endif
 
+
+// floating point comparisons
+constexpr float SMALL_EPSILON = 1e-8;
+// approximation in physical simulations
+constexpr float MEDIUM_EPSILON = 1e-6;
+// low precision
+constexpr float LARGE_EPSILON = 1e-3;
+
+
+
 ///////////////////////////////////////////////////////////
 
 /***********************
