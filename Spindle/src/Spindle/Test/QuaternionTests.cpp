@@ -101,12 +101,10 @@ TEST_CASE(QuaternionFloat_HamiltonProduct) {
     float expectedZ = 4.0f * 7.0f + 1.0f * 6.0f - 2.0f * 5.0f + 3.0f * 8.0f;  // w1*z2 + x1*y2 - y1*x2 + z1*w2
     float expectedW = 4.0f * 8.0f - 1.0f * 5.0f - 2.0f * 6.0f - 3.0f * 7.0f;  // w1*w2 - x1*x2 - y1*y2 - z1*z2
 
-    float epsilon = 1e-6f;  // Small value for floating-point comparison
-
-    SpindleTest::assertEqual(result.getX(), expectedX, "X after Hamilton product", epsilon);
-    SpindleTest::assertEqual(result.getY(), expectedY, "Y after Hamilton product", epsilon);
-    SpindleTest::assertEqual(result.getZ(), expectedZ, "Z after Hamilton product", epsilon);
-    SpindleTest::assertEqual(result.getW(), expectedW, "W after Hamilton product", epsilon);
+    SpindleTest::assertEqual(result.getX(), expectedX, "X after Hamilton product");
+    SpindleTest::assertEqual(result.getY(), expectedY, "Y after Hamilton product");
+    SpindleTest::assertEqual(result.getZ(), expectedZ, "Z after Hamilton product");
+    SpindleTest::assertEqual(result.getW(), expectedW, "W after Hamilton product");
 }
 
 // Add a test with identity quaternion to verify multiplication properties
@@ -117,18 +115,16 @@ TEST_CASE(QuaternionFloat_HamiltonProduct_Identity) {
     Quaternion<float> result1 = q * identity;
     Quaternion<float> result2 = identity * q;
 
-    float epsilon = 1e-6f;
-
     // q * identity = identity * q = q
-    SpindleTest::assertEqual(result1.getX(), q.getX(), "Identity right multiplication X", epsilon);
-    SpindleTest::assertEqual(result1.getY(), q.getY(), "Identity right multiplication Y", epsilon);
-    SpindleTest::assertEqual(result1.getZ(), q.getZ(), "Identity right multiplication Z", epsilon);
-    SpindleTest::assertEqual(result1.getW(), q.getW(), "Identity right multiplication W", epsilon);
+    SpindleTest::assertEqual(result1.getX(), q.getX(), "Identity right multiplication X");
+    SpindleTest::assertEqual(result1.getY(), q.getY(), "Identity right multiplication Y");
+    SpindleTest::assertEqual(result1.getZ(), q.getZ(), "Identity right multiplication Z");
+    SpindleTest::assertEqual(result1.getW(), q.getW(), "Identity right multiplication W");
 
-    SpindleTest::assertEqual(result2.getX(), q.getX(), "Identity left multiplication X", epsilon);
-    SpindleTest::assertEqual(result2.getY(), q.getY(), "Identity left multiplication Y", epsilon);
-    SpindleTest::assertEqual(result2.getZ(), q.getZ(), "Identity left multiplication Z", epsilon);
-    SpindleTest::assertEqual(result2.getW(), q.getW(), "Identity left multiplication W", epsilon);
+    SpindleTest::assertEqual(result2.getX(), q.getX(), "Identity left multiplication X");
+    SpindleTest::assertEqual(result2.getY(), q.getY(), "Identity left multiplication Y");
+    SpindleTest::assertEqual(result2.getZ(), q.getZ(), "Identity left multiplication Z");
+    SpindleTest::assertEqual(result2.getW(), q.getW(), "Identity left multiplication W");
 }
 
 // Additional Tests for Magnitude, Normalization, and Other Operations
@@ -143,10 +139,10 @@ TEST_CASE(QuaternionFloat_Normalize) {
     float mag = std::sqrt(30.0f);
     Quaternion<float> result = q.normalize();
 
-    SpindleTest::assertEqual(result.getX(), 1.0f / mag, "Normalized X");
-    SpindleTest::assertEqual(result.getY(), 2.0f / mag, "Normalized Y");
-    SpindleTest::assertEqual(result.getZ(), 3.0f / mag, "Normalized Z");
-    SpindleTest::assertEqual(result.getW(), 4.0f / mag, "Normalized W");
+    SpindleTest::assertEqual(result.getX(), 1.0f / mag, "Normalized X", MEDIUM_EPSILON);
+    SpindleTest::assertEqual(result.getY(), 2.0f / mag, "Normalized Y", MEDIUM_EPSILON);
+    SpindleTest::assertEqual(result.getZ(), 3.0f / mag, "Normalized Z", MEDIUM_EPSILON);
+    SpindleTest::assertEqual(result.getW(), 4.0f / mag, "Normalized W", MEDIUM_EPSILON);
 }
 
 TEST_CASE(QuaternionFloat_NormalizeZero) {

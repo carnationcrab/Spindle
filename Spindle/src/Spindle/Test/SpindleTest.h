@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include "../Log.h"
+#include "../SETTINGS.h"
 
 namespace SpindleTest {
 
@@ -108,7 +109,8 @@ namespace SpindleTest {
 
         void logTestSummary(size_t passed, size_t failed) const {
             size_t total = passed + failed;
-            SPINDLE_TEST_INFO("Summary:");
+            SPINDLE_TEST_HEADER("\n");
+            SPINDLE_TEST_HEADER("====== SUMMARY: ======");
             SPINDLE_TEST_INFO("  Total tests run: {}", total);
             passed == total ? SPINDLE_TEST_PASS("  Passed: {}/{}", passed, total) :
                               SPINDLE_TEST_INFO("  Passed: {}/{}", passed, total);
@@ -129,7 +131,7 @@ namespace SpindleTest {
         }
     }
 
-    inline void assertEqual(float a, float b, const std::string& message, float epsilon = 1e-6f) {
+    inline void assertEqual(float a, float b, const std::string& message, float epsilon = SMALL_EPSILON) {
         if (std::fabs(a - b) > epsilon) {
             SPINDLE_TEST_FAIL("Assertion failed: {} ({} != {} within epsilon {})", message, a, b, epsilon);
             throw std::runtime_error(message);

@@ -44,6 +44,6 @@ namespace Spindle {
 #define SPINDLE_TEST_PASS(...)     ::Spindle::Log::GetTestLogger()->info(__VA_ARGS__)
 #define SPINDLE_TEST_INFO(...)     ::Spindle::Log::GetTestLogger()->trace(__VA_ARGS__)
 #define SPINDLE_TEST_FAIL(...)     ::Spindle::Log::GetTestLogger()->error(__VA_ARGS__)
-#define SPINDLE_TEST_HEADER(...)    ::Spindle::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define SPINDLE_TEST_HEADER(...)   ::Spindle::Log::GetTestLogger()->warn(__VA_ARGS__)
 
 
