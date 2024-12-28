@@ -37,4 +37,6 @@ void Manager::shutDown()
 void Manager::stopAllProcesses()
 {
     assert(isInitialized && "Manager not initialized!");
+
+    // perform stops etc
 }
