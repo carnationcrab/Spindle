@@ -44,7 +44,7 @@ namespace Spindle {
     }
 
     // extracts the second element (index 3) from 
-// an __m128 vector
+    // an __m128 vector
     inline float SSE_GetW(__m128 v) noexcept {
         return _mm_cvtss_f32(_mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 3, 3, 3)));
     }
@@ -69,6 +69,34 @@ namespace Spindle {
         return _mm_mul_ps(a, b);
     }
 
+    // Fused multiply-add: (a * b) + c
+    inline __m128 SSE_MultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
+#ifdef __FMA__
+        return _mm_fmadd_ps(a, b, c); 
+#else
+        return _mm_add_ps(_mm_mul_ps(a, b), c);
+#endif
+    }
+
+    // Fused multiply-subtract: (a * b) - c
+    inline __m128 SSE_MultiplySubtract(__m128 a, __m128 b, __m128 c) noexcept {
+#ifdef __FMA__
+        return _mm_fmsub_ps(a, b, c);
+#else
+        return _mm_sub_ps(_mm_mul_ps(a, b), c);
+#endif
+    }
+
+    // Negated fused multiply-add: -(a * b) + c
+    inline __m128 SSE_NegativeMultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
+#ifdef __FMA__
+        return _mm_fnmadd_ps(a, b, c);
+#else
+        return _mm_add_ps(_mm_sub_ps(_mm_setzero_ps(), _mm_mul_ps(a, b)), c);
+#endif
+    }
+
+    // compares against itself
     inline __m128 SSE_CmpOrd(__m128 a) noexcept {
         return _mm_cmpord_ss(a, a);
     }
@@ -77,13 +105,29 @@ namespace Spindle {
         return _mm_cmpord_ss(a, b);
     }
 
-    inline __m128 SSE_(__m128 a, __m128 b) noexcept {
-        return _mm_cmpord_ss(a, b);
+    inline __m128 SSE_HorizontalAdd(__m128 a, __m128 b) noexcept {
+        return _mm_hadd_ps(a, b);
+    }
+
+    inline __m128 SSE_ShuffleYZXW(__m128 a) {
+        return _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
+    }
+
+    inline float SSE_Dot(__m128 a, __m128 b) noexcept {
+        // perform element-wise multiplication
+        __m128 multResult = SSE_Multiply(a, b);
+
+        // horizontal add to sum the elements
+        __m128  addResult = SSE_HorizontalAdd(multResult, multResult);
+        addResult = SSE_HorizontalAdd(addResult, addResult);
+
+        // extract the final result
+        return SSE_GetX(addResult);
     }
 
     // computes the dot product using transposed loading approach
     // for large data
-    inline __m128 SSE_Dot_Floats(
+    inline __m128 SSE_Dot(
         const float* a, 
         const float* b) 
         noexcept {
@@ -107,7 +151,7 @@ namespace Spindle {
         return result;
     }
 
-    inline __m128 SSE_DotArrays(
+    inline __m128 SSE_Dot(
         int count,
         float r[],
         const float a[],
@@ -135,7 +179,6 @@ namespace Spindle {
         }
     }
 
-
     // dot product of two vectors
     //inline float SSE_Dot(__m128 a, __m128 b) noexcept {
     //    // perform element-wise multiplication
@@ -143,58 +186,18 @@ namespace Spindle {
     //     float  addResult = SSE_GetX(multResult) 
     //                        + SSE_GetY(multResult) 
     //                        + SSE_GetZ(multResult);
-
     //     return addResult;
     //}
 
-    inline float SSE_Dot(__m128 a, __m128 b) noexcept {
-        // perform element-wise multiplication
-        __m128 multResult = SSE_Multiply(a, b);
-
-        // horizontal add to sum the elements
-        __m128  addResult = _mm_hadd_ps(multResult, multResult);
-                addResult = _mm_hadd_ps(addResult, addResult);
-
-        // extract the final result
-        return SSE_GetX(addResult);
-    }
-
     // todo encapsulate suffle
     inline __m128 SSE_Cross(__m128 a, __m128 b) noexcept {
-        __m128     a_yzx = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
-        __m128     b_yzx = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1));
+        __m128     a_yzx = SSE_ShuffleYZXW(a);
+        __m128     b_yzx = SSE_ShuffleYZXW(a);
 
-        __m128 crossProd = _mm_sub_ps(SSE_Multiply(a, b_yzx), 
+        __m128 crossProd = SSE_Subtract(SSE_Multiply(a, b_yzx), 
                                       SSE_Multiply(a_yzx, b));
 
-        return _mm_shuffle_ps(crossProd, crossProd, _MM_SHUFFLE(3, 0, 2, 1));;
-    }
-
-    // Fused multiply-add: (a * b) + c
-    inline __m128 SSE_MultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
-#ifdef __FMA__
-        return _mm_fmadd_ps(a, b, c);  // If FMA is available
-#else
-        return _mm_add_ps(_mm_mul_ps(a, b), c);  // Fall back to separate multiply and add
-#endif
-    }
-
-    // Fused multiply-subtract: (a * b) - c
-    inline __m128 SSE_MultiplySubtract(__m128 a, __m128 b, __m128 c) noexcept {
-#ifdef __FMA__
-        return _mm_fmsub_ps(a, b, c);  // If FMA is available
-#else
-        return _mm_sub_ps(_mm_mul_ps(a, b), c);  // Fall back to separate multiply and subtract
-#endif
-    }
-
-    // Negated fused multiply-add: -(a * b) + c
-    inline __m128 SSE_NegativeMultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
-#ifdef __FMA__
-        return _mm_fnmadd_ps(a, b, c);  // If FMA is available
-#else
-        return _mm_add_ps(_mm_sub_ps(_mm_setzero_ps(), _mm_mul_ps(a, b)), c);
-#endif
+        return SSE_ShuffleYZXW(crossProd);
     }
 }
 
