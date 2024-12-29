@@ -77,9 +77,14 @@ namespace Spindle {
         return _mm256_castps256_ps128(v);
     }
 
-    // Extracts the last 128 bits of a 256-bit AVX vector.
+    // extracts the last 128 bits of a 256-bit AVX vector.
     inline __m128 AVX_GetLast128(__m256 v) {
         return _mm256_extractf128_ps(v, 1);
+    }
+
+    // swaps the high and low halves of a 256-bit AVX vector.
+    inline __m256 AVX_SwapHalves(__m256 v) {
+        return _mm256_permute2f128_ps(v, v, 1);
     }
 
     inline std::string AVX_ToString(__m256 vec) noexcept {
@@ -159,15 +164,14 @@ namespace Spindle {
         return _mm_hadd_ps(a, b);
     }
 
-    // Perform a horizontal add on a 256-bit AVX vector and return a __m256
-    inline __m256 AVX_HorizontalAdd(__m256 vec) {
-        // Step 1: Shuffle and add the two 128-bit halves
-        __m256 temp = _mm256_permute2f128_ps(vec, vec, 1); // Swap high and low halves
-        __m256 sum1 = _mm256_add_ps(vec, temp);           // Add the two halves
+    inline __m256 AVX_HorizontalAdd(__m256 v) {
+        // shuffle and add the two 128-bit halves
+        __m256 swappedV = AVX_SwapHalves(v);      // swap high and low halves
+        __m256     sum1 = AVX_Add(v, swappedV);   // add together
 
-        // Step 2: Perform horizontal addition within each 128-bit lane
-        __m256 sum2 = _mm256_hadd_ps(sum1, sum1); // Horizontal add within lanes
-        __m256 result = _mm256_hadd_ps(sum2, sum2); // Final horizontal add
+        // perform horizontal addition within each 128-bit lane
+        __m256   sum2 = _mm256_hadd_ps(sum1, sum1); // horizontal add
+        __m256 result = _mm256_hadd_ps(sum2, sum2); // twice
 
         return result;
     }
@@ -181,20 +185,17 @@ namespace Spindle {
     *           methods           *
     ******************************/
 
-    // Computes the dot product of two vectors
+    // computes the dot product of two vectors
     inline float AVX_Dot(__m256 a, __m256 b) noexcept {
-        // Perform element-wise multiplication
         __m256 multResult = AVX_Multiply(a, b);
 
         __m128    lowHalf = AVX_GetFirst128(multResult);   // low 128 bits
         __m128   highHalf = AVX_GetLast128(multResult);    // high 128 bits
         __m128        sum = AVX_Add(lowHalf, highHalf);
 
-        // horizontal add the elements
         sum = AVX_HorizontalAdd(sum, sum);
         sum = AVX_HorizontalAdd(sum, sum);
 
-        // extract the scalar result
         return AVX_GetScalar(sum);
     }
 
@@ -207,10 +208,10 @@ namespace Spindle {
            
                result = AVX_Add(result, AVX_Multiply(va, vb));
         }
-        return AVX_Dot(result, AVX_Set(1.0f)); // Sum all elements in result
+        return AVX_Dot(result, AVX_Set(1.0f)); // sum all elements in result
     }
 
-    // Computes the cross product of two vectors
+    // computes the cross product of two vectors
     inline __m256 AVX_Cross(__m256 a, __m256 b) noexcept {
         __m256     a_yzx = _mm256_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
         __m256     b_yzx = _mm256_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
