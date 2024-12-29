@@ -6,7 +6,7 @@
 // test files to be run 
 // TODO: this is inelegant, could it be automated?
 #include "Test/SettingsTests.cpp"
-#include "Test/Point2DTests.cpp"
+#include "Test/PointTests.cpp"
 #include "Test/Vector2Tests.cpp"
 #include "Test/Vector3Tests.cpp"
 #include "Test/MatrixTests.cpp"
