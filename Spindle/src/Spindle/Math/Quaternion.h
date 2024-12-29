@@ -201,7 +201,7 @@ namespace Spindle {
             __m256 q = AVX_Set(x, y, z, w, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 s = AVX_Set(scalar);
             __m256 result = AVX_Multiply(q, s);
-            return Quaternion<float>(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result), AVX_GetW(result));
+            return setQuaternion(result);
 #elif defined(USE_SSE)
             __m128 q = SSE_Set(x, y, z, w);
             __m128 s = SSE_Set1(scalar);
@@ -215,33 +215,60 @@ namespace Spindle {
         // SIMD multiplication (Hamilton product)
         Quaternion<float> operator*(const Quaternion<float>& q) const noexcept {
 #ifdef USE_AVX
-            // Load quaternion components into AVX registers
-            //__m256 q1 = AVX_Set(x, y, z, w, 0, 0, 0, 0);
-            //__m256 q2 = AVX_Set(q.x, q.y, q.z, q.w, 0, 0, 0, 0);
+            __m256 q1 = AVX_Set(x, y, z, w, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 q2 = AVX_Set(q.x, q.y, q.z, q.w, 0.0f, 0.0f, 0.0f, 0.0f);
 
-            // just using scalar for now as I can't seem to get it to work
-            // TODO SIMD
-            float resultX = w * q.x + x * q.w + y * q.z - z * q.y;
-            float resultY = w * q.y - x * q.z + y * q.w + z * q.x;
-            float resultZ = w * q.z + x * q.y - y * q.x + z * q.w;
-            float resultW = w * q.w - x * q.x - y * q.y - z * q.z;
+            // shuffle components for cross terms (y, z, x, w)
+            __m256 q1_yzx = AVX_ShuffleYZXW(q1);
+            __m256 q2_yzx = AVX_ShuffleYZXW(q2);
+
+            // cross products
+            __m256 cross1 = AVX_Multiply(q1, q2_yzx);       // q1 * q2_yzx
+            __m256 cross2 = AVX_Multiply(q1_yzx, q2);       // q1_yzx * q2
+            __m256  cross = AVX_Subtract(cross1, cross2);   // cross = cross1 - cross2
+
+            // dot product (for w' component)
+            __m256    dot = AVX_Multiply(q1, q2);             
+            __m256 dotSum = AVX_HorizontalAdd(dot);
+
+            float resultX = AVX_GetW(q1) * AVX_GetX(q2) + AVX_GetX(q1) * AVX_GetW(q2) +
+                            AVX_GetY(q1) * AVX_GetZ(q2) - AVX_GetZ(q1) * AVX_GetY(q2);
+
+            float resultY = AVX_GetW(q1) * AVX_GetY(q2) - AVX_GetX(q1) * AVX_GetZ(q2) +
+                            AVX_GetY(q1) * AVX_GetW(q2) + AVX_GetZ(q1) * AVX_GetX(q2);
+
+            float resultZ = AVX_GetW(q1) * AVX_GetZ(q2) + AVX_GetX(q1) * AVX_GetY(q2) -
+                            AVX_GetY(q1) * AVX_GetX(q2) + AVX_GetZ(q1) * AVX_GetW(q2);
+
+            float resultW = AVX_GetW(q1) * AVX_GetW(q2) - AVX_GetX(q1) * AVX_GetX(q2) -
+                            AVX_GetY(q1) * AVX_GetY(q2) - AVX_GetZ(q1) * AVX_GetZ(q2);
 
             return Quaternion<float>(resultX, resultY, resultZ, resultW);
 
 #elif defined(USE_SSE)
-            // Load quaternion components into SSE registers
-            //__m128 q1 = SSE_Set(x, y, z, w);
-            //__m128 q2 = SSE_Set(q.x, q.y, q.z, q.w);
+            __m128 q1 = SSE_Set(x, y, z, w);
+            __m128 q2 = SSE_Set(q.x, q.y, q.z, q.w);
 
-            // TODO SIMD
-            float resultX = w * q.x + x * q.w + y * q.z - z * q.y;
-            float resultY = w * q.y - x * q.z + y * q.w + z * q.x;
-            float resultZ = w * q.z + x * q.y - y * q.x + z * q.w;
-            float resultW = w * q.w - x * q.x - y * q.y - z * q.z;
+            __m128 q1_yzx = SSE_ShuffleYZXW(q1);
+            __m128 q2_yzx = SSE_ShuffleYZXW(q2);
+
+            __m128 cross1 = SSE_Multiply(q1, q2_yzx);
+            __m128 cross2 = SSE_Multiply(q1_yzx, q2);
+            __m128  cross = SSE_Subtract(cross1, cross2);
+
+            __m128    dot = SSE_Multiply(q1, q2);
+            __m128 dotSum = SSE_HorizontalAdd(dot);
+
+            float resultX = SSE_GetX(cross) + SSE_GetW(dot) - SSE_GetY(cross);
+            float resultY = SSE_GetY(cross) - SSE_GetZ(cross) + SSE_GetW(cross) + SSE_GetX(cross);
+            float resultZ = SSE_GetZ(cross) + SSE_GetY(dot) - SSE_GetX(cross) + SSE_GetW(cross);
+            float resultW = SSE_GetW(dot) - SSE_GetX(dot) - SSE_GetY(dot) - SSE_GetZ(dot);
 
             return Quaternion<float>(resultX, resultY, resultZ, resultW);
 
+
 #else
+            // Scalar fallback
             return Quaternion<float>(
                 w * q.x + x * q.w + y * q.z - z * q.y,
                 w * q.y - x * q.z + y * q.w + z * q.x,
@@ -250,7 +277,6 @@ namespace Spindle {
             );
 #endif
         }
-
 
         // normalise
         Quaternion<float> normalize() const noexcept {
@@ -306,7 +332,7 @@ namespace Spindle {
         **********************/
 
         // string
-        std::string toString() const noexcept {
+        std::string ToString() const noexcept {
             std::ostringstream oss;
             oss << "(" << x << ", " << y << ", " << z << ", " << w << ")";
             return oss.str();

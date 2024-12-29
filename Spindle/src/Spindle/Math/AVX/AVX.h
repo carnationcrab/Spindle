@@ -1,6 +1,8 @@
 #pragma once
 
 #include <immintrin.h> // AVX intrinsics
+#include <string>
+#include <sstream>
 
 // AVX utilities for 256-bit SIMD operations
 namespace Spindle {
@@ -10,7 +12,15 @@ namespace Spindle {
     ******************************/
 
     // initializes an __m256 variable with eight float values
-    inline __m256 AVX_Set(float x, float y, float z, float w, float a, float b, float c, float d) noexcept {
+    inline __m256 AVX_Set(
+        float x, 
+        float y, 
+        float z = 0.0f, 
+        float w = 0.0f, 
+        float a = 0.0f, 
+        float b = 0.0f, 
+        float c = 0.0f, 
+        float d = 0.0f) noexcept {
         return _mm256_set_ps(d, c, b, a, w, z, y, x);
     }
 
@@ -70,6 +80,22 @@ namespace Spindle {
     // Extracts the last 128 bits of a 256-bit AVX vector.
     inline __m128 AVX_GetLast128(__m256 v) {
         return _mm256_extractf128_ps(v, 1);
+    }
+
+    inline std::string AVX_ToString(__m256 vec) noexcept {
+        alignas(32) float elements[8];
+        _mm256_store_ps(elements, vec); // Store the contents of the AVX register into the array
+
+        std::ostringstream oss;
+        oss << "(";
+        for (int i = 0; i < 8; ++i) {
+            oss << elements[i];
+            if (i < 7) {
+                oss << ", ";
+            }
+        }
+        oss << ")";
+        return oss.str();
     }
 
     /******************************
@@ -133,6 +159,23 @@ namespace Spindle {
         return _mm_hadd_ps(a, b);
     }
 
+    // Perform a horizontal add on a 256-bit AVX vector and return a __m256
+    inline __m256 AVX_HorizontalAdd(__m256 vec) {
+        // Step 1: Shuffle and add the two 128-bit halves
+        __m256 temp = _mm256_permute2f128_ps(vec, vec, 1); // Swap high and low halves
+        __m256 sum1 = _mm256_add_ps(vec, temp);           // Add the two halves
+
+        // Step 2: Perform horizontal addition within each 128-bit lane
+        __m256 sum2 = _mm256_hadd_ps(sum1, sum1); // Horizontal add within lanes
+        __m256 result = _mm256_hadd_ps(sum2, sum2); // Final horizontal add
+
+        return result;
+    }
+
+
+    inline __m256 AVX_ShuffleYZXW(__m256 v) noexcept {
+        return _mm256_permute_ps(v, _MM_SHUFFLE(3, 0, 2, 1));
+    }
 
     /******************************
     *           methods           *
