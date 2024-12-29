@@ -113,9 +113,9 @@ namespace SpindleTest {
             SPINDLE_TEST_HEADER("====== SUMMARY: ======");
             SPINDLE_TEST_INFO("  Total tests run: {}", total);
             passed == total ? SPINDLE_TEST_PASS("  Passed: {}/{}", passed, total) :
-                              SPINDLE_TEST_INFO("  Passed: {}/{}", passed, total);
+                SPINDLE_TEST_INFO("  Passed: {}/{}", passed, total);
             failed > 0 ? SPINDLE_TEST_FAIL("  Failed: {}/{}", failed, total) :
-                         SPINDLE_TEST_INFO("  Failed: {}/{}", failed, total);
+                SPINDLE_TEST_INFO("  Failed: {}/{}", failed, total);
         }
     };
 
@@ -148,6 +148,14 @@ namespace SpindleTest {
     inline void assertEqual(const std::string& a, const std::string& b, const std::string& message) {
         if (a != b) {
             SPINDLE_TEST_FAIL("Assertion failed: {} (\"{}\" != \"{}\")", message, a, b);
+            throw std::runtime_error(message);
+        }
+    }
+
+    template <typename T>
+    inline void assertEqual(const T& a, const T& b, const std::string& message) {
+        if (a != b) {
+            SPINDLE_TEST_FAIL("Assertion failed: {} ({} != {})", message, a.ToString(), b.ToString());
             throw std::runtime_error(message);
         }
     }
