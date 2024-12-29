@@ -108,8 +108,14 @@ namespace Spindle {
         return _mm256_permute2f128_ps(v, v, 1);
     }
 
+    // shuffles. used for cross products 3,0,2,1
     inline __m256 AVX_ShuffleYZXW(__m256 v) noexcept {
         return _mm256_permute_ps(v, _MM_SHUFFLE(3, 0, 2, 1));
+    }
+
+    // shuffles 3,1,0,2
+    inline __m256 AVX_ShuffleZXYW(__m256 v) noexcept {
+        return _mm256_permute_ps(v, _MM_SHUFFLE(3, 1, 0, 2));
     }
 
     inline std::string AVX_ToString(__m256 vec) noexcept {
@@ -205,12 +211,12 @@ namespace Spindle {
 
     // computes the cross product of two vectors
     inline __m256 AVX_Cross(__m256 a, __m256 b) noexcept {
-        __m256     a_yzx = _mm256_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
-        __m256     b_yzx = _mm256_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
+        __m256     a_yzx = AVX_ShuffleYZXW(a);
+        __m256     b_yzx = AVX_ShuffleYZXW(b);
 
         __m256 crossProd = AVX_Subtract(AVX_Multiply(a, b_yzx), AVX_Multiply(a_yzx, b));
 
-        return _mm256_permute_ps(crossProd, _MM_SHUFFLE(3, 0, 2, 1));
+        return AVX_ShuffleYZXW(crossProd);
     }
 
     // computes the dot product of two vectors

@@ -13,9 +13,6 @@
 **************************/
 
 namespace Spindle {
-    template <typename T, size_t Dimension>
-    struct Point;
-
     // all other types use scalar
     template <typename T, size_t Dimension>
     struct Point {
@@ -112,7 +109,7 @@ namespace Spindle {
     // floats use SIMD
     template <>
     struct Point<float, 2> {
-        float x, y;
+        alignas(16) float x, y;
 
         /**********************
         *    constructors     *
@@ -268,7 +265,7 @@ namespace Spindle {
 
     template <>
     struct Point<float, 3> {
-        float x, y, z;
+        alignas(16) float x, y, z;
 
         /**********************
         *    constructors     *
@@ -283,20 +280,71 @@ namespace Spindle {
         **********************/
 
         Point operator+(const Vector<float, 3>& vec) const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 v = AVX_Set(vec.x, vec.y, vec.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Add(p, v);
+            return Point(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, z, 0.0f);
+            __m128 v = SSE_Set(vec.x, vec.y, vec.z, 0.0f);
+            __m128 result = SSE_Add(p, v);
+            return Point(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
+#else
             return Point(x + vec.x, y + vec.y, z + vec.z);
+#endif
         }
+
 
         Vector<float, 3> operator-(const Point& other) const noexcept {
+#ifdef USE_AVX
+            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Subtract(p1, p2);
+            return Vector<float, 3>(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+#elif defined(USE_SSE)
+            __m128 p1 = SSE_Set(x, y, z, 0.0f);
+            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128 result = SSE_Subtract(p1, p2);
+            return Vector<float, 3>(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
+#else
             return Vector<float, 3>(x - other.x, y - other.y, z - other.z);
+#endif
         }
 
+
         bool operator==(const Point& other) const noexcept {
+#ifdef USE_AVX
+            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 cmp = AVX_CompareEqual(p1, p2);
+            return AVX_AllTrue(cmp);
+#elif defined(USE_SSE)
+            __m128 p1 = SSE_Set(x, y, z, 0.0f);
+            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128 cmp = SSE_CompareEqual(p1, p2);
+            return SSE_AllTrue(cmp);
+#else
             return x == other.x && y == other.y && z == other.z;
+#endif
         }
 
         bool operator!=(const Point& other) const noexcept {
+#ifdef USE_AVX
+            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 cmp = AVX_CompareNotEqual(p1, p2);
+            return AVX_AnyTrue(cmp);
+#elif defined(USE_SSE)
+            __m128 p1 = SSE_Set(x, y, z, 0.0f);
+            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128 cmp = SSE_CompareNotEqual(p1, p2);
+            return SSE_AnyTrue(cmp);
+#else
             return !(*this == other);
+#endif
         }
+
 
         /**********************
         *       methods       *

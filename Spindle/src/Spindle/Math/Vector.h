@@ -359,10 +359,10 @@ namespace Spindle {
                 __m256 b = AVX_Set(operand.x, operand.y, operand.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
                 // shuffle components for cross product computation
-                __m256 a_yzx = _mm256_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
-                __m256 b_yzx = _mm256_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
-                __m256 a_zxy = _mm256_permute_ps(a, _MM_SHUFFLE(3, 1, 0, 2));
-                __m256 b_zxy = _mm256_permute_ps(b, _MM_SHUFFLE(3, 1, 0, 2));
+                __m256 a_yzx = AVX_ShuffleYZXW(a);
+                __m256 b_yzx = AVX_ShuffleYZXW(b);
+                __m256 a_zxy = AVX_ShuffleZXYW(a);
+                __m256 b_zxy = AVX_ShuffleZXYW(b);
 
                 __m256 cross = AVX_Subtract(AVX_Multiply(a_yzx, b_zxy), AVX_Multiply(a_zxy, b_yzx));
                 return setVector(cross);
@@ -371,10 +371,10 @@ namespace Spindle {
                 __m128 b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
 
                 // shuffle components for cross product computation
-                __m128 a_yzx = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
-                __m128 b_yzx = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 0, 2, 1));
-                __m128 a_zxy = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 1, 0, 2));
-                __m128 b_zxy = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 1, 0, 2));
+                __m128 a_yzx = SSE_ShuffleYZXW(a);
+                __m128 b_yzx = SSE_ShuffleYZXW(b);
+                __m128 a_zxy = SSE_ShuffleZXYW(a);
+                __m128 b_zxy = SSE_ShuffleZXYW(b);
 
                 __m128 cross = SSE_Subtract(SSE_Multiply(a_yzx, b_zxy), SSE_Multiply(a_zxy, b_yzx));
                 return setVector(cross);

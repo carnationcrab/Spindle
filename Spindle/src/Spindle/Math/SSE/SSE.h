@@ -59,6 +59,15 @@ namespace Spindle {
         return _mm_cvtss_f32(_mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 3, 3, 3)));
     }
 
+    inline __m128 SSE_ShuffleYZXW(__m128 v) noexcept {
+        return _mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 0, 2, 1));
+    }
+
+    inline __m128 SSE_ShuffleZXYW(__m128 v) noexcept {
+        return _mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 1, 0, 2));
+    }
+
+
     /******************************
     *         comparison          *
     ******************************/
@@ -141,10 +150,6 @@ namespace Spindle {
 
     inline __m128 SSE_HorizontalAdd(__m128 a, __m128 b) noexcept {
         return _mm_hadd_ps(a, b);
-    }
-
-    inline __m128 SSE_ShuffleYZXW(__m128 a) {
-        return _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
     }
 
     inline float SSE_Dot(__m128 a, __m128 b) noexcept {
