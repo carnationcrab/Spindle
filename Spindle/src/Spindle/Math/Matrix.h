@@ -103,7 +103,7 @@ namespace Spindle {
         }
 
         // string
-        std::string toString() const noexcept {
+        std::string ToString() const noexcept {
             std::ostringstream oss;
             for (size_t i = 0; i < N; ++i) {
                 oss << "[ ";
@@ -278,7 +278,7 @@ namespace Spindle {
             return result;
         }
 
-        std::string toString() const noexcept {
+        std::string ToString() const noexcept {
 
             std::ostringstream oss;
 

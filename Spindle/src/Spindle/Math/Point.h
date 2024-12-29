@@ -95,7 +95,7 @@ namespace Spindle {
             return Point(result);
         }
 
-        std::string toString() const {
+        std::string ToString() const {
             std::string result = "(";
             for (size_t i = 0; i < Dimension; ++i) {
                   result += std::to_string(coordinates[i]);
@@ -275,7 +275,7 @@ namespace Spindle {
             return Point(SSE_GetX(result), SSE_GetY(result));
         }
 
-        std::string toString() const {
+        std::string ToString() const {
             return "(" + std::to_string(x) + 
                    ", " + std::to_string(y) + 
                                           ")";
@@ -463,7 +463,7 @@ namespace Spindle {
             return Point(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
         }
 
-        std::string toString() const {
+        std::string ToString() const {
             return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
         }
     };
