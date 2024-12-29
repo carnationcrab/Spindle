@@ -110,7 +110,7 @@ namespace Spindle {
         **********************/
 
         // string
-        std::string toString() const noexcept {
+        std::string ToString() const noexcept {
             std::ostringstream oss;
             oss << "(" << x << ", " << y << ", " << z << ", " << w << ")";
             return oss.str();

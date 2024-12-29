@@ -56,7 +56,7 @@ TEST_CASE(Point2D_EqualityOperator) {
 
 TEST_CASE(Point2D_ToString) {
     Point<float, 2> p(1.0f, 2.0f);
-    SpindleTest::assertTrue(p.toString() == "(1.000000, 2.000000)", "toString output should be (1.000000, 2.000000)");
+    SpindleTest::assertTrue(p.ToString() == "(1.000000, 2.000000)", "ToString output should be (1.000000, 2.000000)");
 }
 
 TEST_CASE(Point3D_DefaultConstructor) {
@@ -115,5 +115,5 @@ TEST_CASE(Point3D_EqualityOperator) {
 
 TEST_CASE(Point3D_ToString) {
     Point<float, 3> p(1.0f, 2.0f, 3.0f);
-    SpindleTest::assertTrue(p.toString() == "(1.000000, 2.000000, 3.000000)", "toString output should be (1.000000, 2.000000, 3.000000)");
+    SpindleTest::assertTrue(p.ToString() == "(1.000000, 2.000000, 3.000000)", "ToString output should be (1.000000, 2.000000, 3.000000)");
 }

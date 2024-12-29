@@ -57,7 +57,7 @@ TEST_CASE(Vector2D_UnitVector) {
 
 TEST_CASE(Vector2D_ToString) {
     Vector<float, 2> v(1.0f, 2.0f);
-    SpindleTest::assertTrue(v.toString() == "(1.000000, 2.000000)", "toString output should be (1.000000, 2.000000)");
+    SpindleTest::assertTrue(v.ToString() == "(1.000000, 2.000000)", "ToString output should be (1.000000, 2.000000)");
 }
 
 /**********************
@@ -128,5 +128,5 @@ TEST_CASE(Vector3D_UnitVector) {
 
 TEST_CASE(Vector3D_ToString) {
     Vector<float, 3> v(1.0f, 2.0f, 3.0f);
-    SpindleTest::assertTrue(v.toString() == "(1.000000, 2.000000, 3.000000)", "toString output should be (1.000000, 2.000000, 3.000000)");
+    SpindleTest::assertTrue(v.ToString() == "(1.000000, 2.000000, 3.000000)", "ToString output should be (1.000000, 2.000000, 3.000000)");
 }

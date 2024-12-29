@@ -67,6 +67,20 @@ namespace Spindle {
             return Vector(result);
         }
 
+        bool operator==(const Vector& other) const noexcept {
+            for (size_t i = 0; i < Dimension; ++i) {
+                if (components[i] != other.components[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool operator!=(const Vector& other) const noexcept {
+            return !(*this == other);
+        }
+
+
         /**********************
         *       methods       *
         **********************/
@@ -96,7 +110,7 @@ namespace Spindle {
             return Vector(result);
         }
 
-        std::string toString() const {
+        std::string ToString() const {
             std::string result = "(";
             for (size_t i = 0; i < Dimension; ++i) {
                 result += std::to_string(coordinates[i]);
@@ -176,6 +190,25 @@ namespace Spindle {
 #else
             return Vector(x * scalar, y * scalar);
 #endif
+        }
+
+        bool operator==(const Vector<float, 2>& other) const noexcept {
+#ifdef USE_AVX
+            __m256 a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 b = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            return AVX_AllTrue(AVX_CompareEqual(a, b));
+#elif defined(USE_SSE)
+            __m128 a = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128 b = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            return SSE_AllTrue(SSE_CompareEqual(a, b));
+#else
+            return x == other.x && y == other.y;
+#endif
+        }
+
+        // Inequality operator
+        bool operator!=(const Vector<float, 2>& other) const noexcept {
+            return !(*this == other);
         }
 
         /**********************
@@ -266,7 +299,7 @@ namespace Spindle {
             return Vector(SSE_GetX(result), SSE_GetY(result));
         }
 
-        std::string toString() const noexcept {
+        std::string ToString() const noexcept {
             return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
         }
         };
@@ -351,6 +384,25 @@ namespace Spindle {
                     y * scalar, 
                     z * scalar);
 #endif
+            }
+
+            bool operator==(const Vector<float, 3>& other) const noexcept {
+#ifdef USE_AVX
+                __m256 a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                __m256 b = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                return AVX_AllTrue(AVX_CompareEqual(a, b));
+#elif defined(USE_SSE)
+                __m128 a = SSE_Set(x, y, z, 0.0f);
+                __m128 b = SSE_Set(other.x, other.y, other.z, 0.0f);
+                return SSE_AllTrue(SSE_CompareEqual(a, b));
+#else
+                return x == other.x && y == other.y && z == other.z;
+#endif
+            }
+
+            // Inequality operator
+            bool operator!=(const Vector<float, 3>& other) const noexcept {
+                return !(*this == other);
             }
 
             /**********************
@@ -463,7 +515,7 @@ namespace Spindle {
                 return Vector(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
             }
 
-            std::string toString() const noexcept {
+            std::string ToString() const noexcept {
                 return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
             }
         };
