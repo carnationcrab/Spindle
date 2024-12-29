@@ -39,9 +39,30 @@ namespace Spindle {
         _mm256_store_ps(data, v);
     }
 
+    /******************************
+    *         comparison          *
+    ******************************/
+
     inline __m256 SSE_SetZero() {
         return _mm256_setzero_ps();
     }
+
+    inline __m256 AVX_CompareEqual(__m256 a, __m256 b) {
+        return _mm256_cmp_ps(a, b, _CMP_EQ_OQ);
+    }
+
+    inline __m256 AVX_CompareNotEqual(__m256 a, __m256 b) {
+        return _mm256_cmp_ps(a, b, _CMP_NEQ_OQ);
+    }
+
+    inline bool AVX_AllTrue(__m256 cmp) {
+        return _mm256_testc_ps(cmp, _mm256_set1_ps(-1.0f));
+    }
+
+    inline bool AVX_AnyTrue(__m256 cmp) {
+        return !_mm256_testz_ps(cmp, _mm256_set1_ps(-1.0f));
+    }
+
 
     /******************************
     *          utilities          *
@@ -51,17 +72,17 @@ namespace Spindle {
         return _mm_cvtss_f32(v);
     }
 
-    // extract the first element (index 0) from an __m256 vector
+    // extracts the first element (index 0) from an __m256 vector
     inline float AVX_GetX(__m256 v) noexcept {
         return AVX_GetScalar(_mm256_castps256_ps128(v));
     }
 
-    // extract the second element (index 1) from an __m256 vector
+    // extracts the second element (index 1) from an __m256 vector
     inline float AVX_GetY(__m256 v) noexcept {
         return AVX_GetScalar(_mm_shuffle_ps(_mm256_castps256_ps128(v), _mm256_castps256_ps128(v), _MM_SHUFFLE(1, 1, 1, 1)));
     }
 
-    // extract the third element (index 2) from an __m256 vector
+    // extracts the third element (index 2) from an __m256 vector
     inline float AVX_GetZ(__m256 v) noexcept {
         return AVX_GetScalar(_mm_shuffle_ps(_mm256_castps256_ps128(v), _mm256_castps256_ps128(v), _MM_SHUFFLE(2, 2, 2, 2)));
     }
@@ -87,6 +108,10 @@ namespace Spindle {
         return _mm256_permute2f128_ps(v, v, 1);
     }
 
+    inline __m256 AVX_ShuffleYZXW(__m256 v) noexcept {
+        return _mm256_permute_ps(v, _MM_SHUFFLE(3, 0, 2, 1));
+    }
+
     inline std::string AVX_ToString(__m256 vec) noexcept {
         alignas(32) float elements[8];
         _mm256_store_ps(elements, vec); // Store the contents of the AVX register into the array
@@ -104,16 +129,18 @@ namespace Spindle {
     }
 
     /******************************
-    *         arithmatic          *
+    *          methods            *
     ******************************/
 
     // addition
-    inline __m256 AVX_Add(__m256 a, __m256 b) noexcept {
-        return _mm256_add_ps(a, b);
-    }
-
+    // TODO this is the same as SSE Add. SSE and AVX should likely
+    // be combined into one SIMD thing.
     inline __m128 AVX_Add(__m128 a, __m128 b) noexcept {
         return _mm_add_ps(a, b);
+    }
+
+    inline __m256 AVX_Add(__m256 a, __m256 b) noexcept {
+        return _mm256_add_ps(a, b);
     }
 
     // subtraction
@@ -176,14 +203,15 @@ namespace Spindle {
         return result;
     }
 
+    // computes the cross product of two vectors
+    inline __m256 AVX_Cross(__m256 a, __m256 b) noexcept {
+        __m256     a_yzx = _mm256_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
+        __m256     b_yzx = _mm256_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
 
-    inline __m256 AVX_ShuffleYZXW(__m256 v) noexcept {
-        return _mm256_permute_ps(v, _MM_SHUFFLE(3, 0, 2, 1));
+        __m256 crossProd = AVX_Subtract(AVX_Multiply(a, b_yzx), AVX_Multiply(a_yzx, b));
+
+        return _mm256_permute_ps(crossProd, _MM_SHUFFLE(3, 0, 2, 1));
     }
-
-    /******************************
-    *           methods           *
-    ******************************/
 
     // computes the dot product of two vectors
     inline float AVX_Dot(__m256 a, __m256 b) noexcept {
@@ -211,15 +239,6 @@ namespace Spindle {
         return AVX_Dot(result, AVX_Set(1.0f)); // sum all elements in result
     }
 
-    // computes the cross product of two vectors
-    inline __m256 AVX_Cross(__m256 a, __m256 b) noexcept {
-        __m256     a_yzx = _mm256_permute_ps(a, _MM_SHUFFLE(3, 0, 2, 1));
-        __m256     b_yzx = _mm256_permute_ps(b, _MM_SHUFFLE(3, 0, 2, 1));
-
-        __m256 crossProd = AVX_Subtract(AVX_Multiply(a, b_yzx), AVX_Multiply(a_yzx, b));
-
-        return _mm256_permute_ps(crossProd, _MM_SHUFFLE(3, 0, 2, 1));
-    }
 }
 
  

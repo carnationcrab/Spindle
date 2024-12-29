@@ -7,6 +7,11 @@
 
 namespace Spindle {
 
+
+    /******************************
+    *   vector initialisation     *
+    ******************************/
+
     // initializes an __m128 variable with the four
     // floating point values provided
     inline __m128 SSE_Set(float x, float y, float z, float w) noexcept {
@@ -24,6 +29,11 @@ namespace Spindle {
     inline void SSE_Store(float* data, __m128 v) noexcept {
         _mm_store_ps(data, v);
     }
+
+
+    /******************************
+    *          utilities          *
+    ******************************/
 
     // extracts the first element (index 0) from 
     // an __m128 vector
@@ -49,17 +59,50 @@ namespace Spindle {
         return _mm_cvtss_f32(_mm_shuffle_ps(v, v, _MM_SHUFFLE(3, 3, 3, 3)));
     }
 
-    // vector addition in parallel
+    /******************************
+    *         comparison          *
+    ******************************/
+
+    inline __m128 SSE_CompareEqual(__m128 a, __m128 b) {
+        return _mm_cmpeq_ps(a, b);
+    }
+
+    inline __m128 SSE_CompareNotEqual(__m128 a, __m128 b) {
+        return _mm_cmpneq_ps(a, b);
+    }
+
+    inline bool SSE_AllTrue(__m128 cmp) {
+        return _mm_movemask_ps(cmp) == 0xF; // All bits set
+    }
+
+    inline bool SSE_AnyTrue(__m128 cmp) {
+        return _mm_movemask_ps(cmp) != 0x0; // At least one bit set
+    }
+
+    // compares against itself
+    inline __m128 SSE_CompareOrder(__m128 a) noexcept {
+        return _mm_cmpord_ss(a, a);
+    }
+
+    inline __m128 SSE_CompareOrder(__m128 a, __m128 b) noexcept {
+        return _mm_cmpord_ss(a, b);
+    }
+
+    /******************************
+    *          methods            *
+    ******************************/
+
+    // addition
     inline __m128 SSE_Add(__m128 a, __m128 b) noexcept {
         return _mm_add_ps(a, b);
     }
 
-    // vector subtraction in parallel
+    // subtraction
     inline __m128 SSE_Subtract(__m128 a, __m128 b) noexcept {
         return _mm_sub_ps(a, b);
     }
 
-    // vector multiplication in parallel
+    // multiplication
     inline __m128 SSE_Multiply(__m128 vec, float scalar) noexcept {
         __m128 scalarVec = _mm_set1_ps(scalar);           // Broadcast scalar across all SIMD lanes
         return _mm_mul_ps(vec, scalarVec);                // Perform SIMD multiplication
@@ -69,7 +112,7 @@ namespace Spindle {
         return _mm_mul_ps(a, b);
     }
 
-    // Fused multiply-add: (a * b) + c
+    // fused multiply-add: (a * b) + c
     inline __m128 SSE_MultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
 #ifdef __FMA__
         return _mm_fmadd_ps(a, b, c); 
@@ -78,7 +121,7 @@ namespace Spindle {
 #endif
     }
 
-    // Fused multiply-subtract: (a * b) - c
+    // fused multiply-subtract: (a * b) - c
     inline __m128 SSE_MultiplySubtract(__m128 a, __m128 b, __m128 c) noexcept {
 #ifdef __FMA__
         return _mm_fmsub_ps(a, b, c);
@@ -87,22 +130,13 @@ namespace Spindle {
 #endif
     }
 
-    // Negated fused multiply-add: -(a * b) + c
+    // negated fused multiply-add: -(a * b) + c
     inline __m128 SSE_NegativeMultiplyAdd(__m128 a, __m128 b, __m128 c) noexcept {
 #ifdef __FMA__
         return _mm_fnmadd_ps(a, b, c);
 #else
         return _mm_add_ps(_mm_sub_ps(_mm_setzero_ps(), _mm_mul_ps(a, b)), c);
 #endif
-    }
-
-    // compares against itself
-    inline __m128 SSE_CmpOrd(__m128 a) noexcept {
-        return _mm_cmpord_ss(a, a);
-    }
-
-    inline __m128 SSE_CmpOrd(__m128 a, __m128 b) noexcept {
-        return _mm_cmpord_ss(a, b);
     }
 
     inline __m128 SSE_HorizontalAdd(__m128 a, __m128 b) noexcept {
@@ -189,7 +223,6 @@ namespace Spindle {
     //     return addResult;
     //}
 
-    // todo encapsulate suffle
     inline __m128 SSE_Cross(__m128 a, __m128 b) noexcept {
         __m128     a_yzx = SSE_ShuffleYZXW(a);
         __m128     b_yzx = SSE_ShuffleYZXW(a);
