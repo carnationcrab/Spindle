@@ -129,7 +129,7 @@ namespace Spindle {
         Matrix() noexcept {
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
-                    ata[i][j] = 0.0f;
+                    data[i][j] = 0.0f;
         }
 
         Matrix(const std::initializer_list<std::initializer_list<float>>& values) noexcept {
