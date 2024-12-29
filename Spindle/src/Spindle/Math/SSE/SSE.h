@@ -80,7 +80,7 @@ namespace Spindle {
         return _mm_cmpneq_ps(a, b);
     }
 
-    inline bool SSE_AllTrue(__m128 cmp) {
+    inline bool SSE_AllEqual(__m128 cmp) {
         return _mm_movemask_ps(cmp) == 0xF; // All bits set
     }
 

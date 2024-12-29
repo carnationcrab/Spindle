@@ -40,10 +40,10 @@ namespace Spindle {
         constexpr T getZ() const noexcept { return z; }
         constexpr T getW() const noexcept { return w; }
 
-        void setX(T newX) noexcept { x = newX; }
-        void setY(T newY) noexcept { y = newY; }
-        void setZ(T newZ) noexcept { z = newZ; }
-        void setW(T newW) noexcept { w = newW; }
+               void setX(T newX) noexcept { x = newX; }
+               void setY(T newY) noexcept { y = newY; }
+               void setZ(T newZ) noexcept { z = newZ; }
+               void setW(T newW) noexcept { w = newW; }
 
         /**********************
         *  operator overloads *
@@ -141,10 +141,10 @@ namespace Spindle {
         float getZ() const noexcept { return z; }
         float getW() const noexcept { return w; }
 
-        void setX(float newX) noexcept { x = newX; }
-        void setY(float newY) noexcept { y = newY; }
-        void setZ(float newZ) noexcept { z = newZ; }
-        void setW(float newW) noexcept { w = newW; }
+         void setX(float newX) noexcept { x = newX; }
+         void setY(float newY) noexcept { y = newY; }
+         void setZ(float newZ) noexcept { z = newZ; }
+         void setW(float newW) noexcept { w = newW; }
 
         Quaternion<float> setQuaternion(__m256 result) const noexcept {
             return Quaternion<float>(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result), AVX_GetW(result));
@@ -304,11 +304,11 @@ namespace Spindle {
         // magnitude (length)
         float magnitude() const noexcept {
 #ifdef USE_AVX
-            __m256 q = AVX_Set(x, y, z, w, 0.0f, 0.0f, 0.0f, 0.0f);
-            return std::sqrt(AVX_Dot(q, q));
+            __m256 q = AVX_Set(x, y, z, w);
+            return std::sqrt(AVX_Dot(q));
 #elif defined(USE_SSE)
             __m128 q = SSE_Set(x, y, z, w);
-            return std::sqrt(SSE_Dot(q, q));
+            return std::sqrt(SSE_Dot(q));
 #else
             return std::sqrt(x * x + y * y + z * z + w * w);
 #endif
@@ -328,12 +328,15 @@ namespace Spindle {
         // dot product
         float dot(const Quaternion<float>& q) const noexcept {
 #ifdef USE_AVX
-            __m256 a = AVX_Set(x, y, z, w, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 b = AVX_Set(q.x, q.y, q.z, q.w, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 a = AVX_Set(x, y, z, w);
+            __m256 b = AVX_Set(q.x, q.y, q.z, q.w);
+            
             return AVX_Dot(a, b);
+
 #elif defined(USE_SSE)
             __m128 a = SSE_Set(x, y, z, w);
             __m128 b = SSE_Set(q.x, q.y, q.z, q.w);
+            
             return SSE_Dot(a, b);
 #else
             return x * q.x + y * q.y + z * q.z + w * q.w;
@@ -347,7 +350,10 @@ namespace Spindle {
         // string
         std::string ToString() const noexcept {
             std::ostringstream oss;
-            oss << "(" << x << ", " << y << ", " << z << ", " << w << ")";
+            oss << "(" << x << ", " 
+                       << y << ", " 
+                       << z << ", " 
+                       << w << ")";
             return oss.str();
         }
     };

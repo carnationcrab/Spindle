@@ -126,14 +126,17 @@ namespace Spindle {
 
         Vector operator+(const Vector& operand) const noexcept {
 #ifdef USE_AVX
-            __m256 a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 b = AVX_Set(operand.x, operand.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      b = AVX_Set(operand.x, operand.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 result = AVX_Add(a, b);
+
             return setVector(result);
+
 #elif defined(USE_SSE)
-            __m128 a = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
+            __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128      b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
             __m128 result = SSE_Add(a, b);
+
             return setVector(result);
 #else
             return Vector(x + operand.x, y + operand.y);
@@ -142,14 +145,16 @@ namespace Spindle {
 
         Vector operator-(const Vector& operand) const noexcept {
 #ifdef USE_AVX
-            __m256 a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 b = AVX_Set(operand.x, operand.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      b = AVX_Set(operand.x, operand.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 result = AVX_Subtract(a, b);
+
             return setVector(result);
 #elif defined(USE_SSE)
-            __m128 a = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
+            __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128      b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
             __m128 result = SSE_Subtract(a, b);
+            
             return setVector(result);
 #else
             return Vector(x - operand.x, y - operand.y);
@@ -158,12 +163,15 @@ namespace Spindle {
 
         Vector operator*(float scalar) const noexcept {
 #ifdef USE_AVX
-            __m256 a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 result = AVX_Multiply(a, scalar);
+           
             return setVector(result);
+
 #elif defined(USE_SSE)
-            __m128 a = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
             __m128 result = SSE_Multiply(a, scalar);
+
             return setVector(result);
 #else
             return Vector(x * scalar, y * scalar);
@@ -176,12 +184,15 @@ namespace Spindle {
 
         Vector unitVector() const noexcept {
 #ifdef USE_AVX
-            __m256 a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 result = AVX_Multiply(a, (1.0f / magnitude()));
+            
             return setVector(result);
+
 #elif defined(USE_SSE)
-            __m128 a = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128      a = SSE_Set(x, y, 0.0f, 0.0f);
             __m128 result = SSE_Multiply(a, (1.0f / magnitude()));
+            
             return setVector(result);
 #else
             float mag = magnitude();
@@ -193,11 +204,15 @@ namespace Spindle {
 #ifdef USE_AVX
             __m256 a = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 b = AVX_Set(operand.x, operand.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            
             return AVX_Dot(a, b);
+
 #elif defined(USE_SSE)
             __m128 a = SSE_Set(x, y, 0.0f, 0.0f);
             __m128 b = SSE_Set(operand.x, operand.y, 0.0f, 0.0f);
+           
             return SSE_Dot(a, b);
+
 #else
             return x * operand.x + y * operand.y;
 #endif
@@ -213,12 +228,18 @@ namespace Spindle {
 
         bool isCollinear(const Vector& operand, float epsilon = 1e-5f) const noexcept {
             float dotProduct = dot(operand);
-            return std::abs(dotProduct - (magnitude() * operand.magnitude())) < epsilon;
+            return std::abs(
+                dotProduct 
+                - (magnitude() * operand.magnitude())) 
+                < epsilon;
         }
 
         bool isCollinearOpposite(const Vector& operand, float epsilon = 1e-5f) const noexcept {
             float dotProduct = dot(operand);
-            return std::abs(dotProduct + (magnitude() * operand.magnitude())) < epsilon;
+            return std::abs(
+                dotProduct 
+                + (magnitude() * operand.magnitude())) 
+                < epsilon;
         }
 
         bool isPerpendicular(const Vector& operand, float epsilon = 1e-5f) const noexcept {
@@ -258,9 +279,11 @@ namespace Spindle {
             *    constructors     *
             **********************/
 
-            constexpr Vector() noexcept : x(T()), y(T()), z(T()) {}
+            constexpr Vector() noexcept 
+                : x(T()), y(T()), z(T()) {}
 
-            Vector(T px, T py, T pz) noexcept : x(px), y(py), z(pz) {}
+            Vector(T px, T py, T pz) noexcept 
+                : x(px), y(py), z(pz) {}
 
             /**********************
             *  operator overloads *
@@ -268,47 +291,65 @@ namespace Spindle {
 
             Vector operator+(const Vector& operand) const noexcept {
 #ifdef USE_AVX
-                __m256 a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
-                __m256 b = AVX_Set(operand.x, operand.y, operand.z, T(), T(), T(), T(), T());
+                __m256      a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
+                __m256      b = AVX_Set(operand.x, operand.y, operand.z, T(), T(), T(), T(), T());
                 __m256 result = AVX_Add(a, b);
+
                 return setVector(result);
+
 #elif defined(USE_SSE)
-                __m128 a = SSE_Set(x, y, z, T());
-                __m128 b = SSE_Set(operand.x, operand.y, operand.z, T());
+                __m128      a = SSE_Set(x, y, z, T());
+                __m128      b = SSE_Set(operand.x, operand.y, operand.z, T());
                 __m128 result = SSE_Add(a, b);
+
                 return setVector(result);
 #else
-                return Vector(x + operand.x, y + operand.y, z + operand.z);
+                return Vector(
+                    x + operand.x, 
+                    y + operand.y, 
+                    z + operand.z);
 #endif
             }
 
             Vector operator-(const Vector& operand) const noexcept {
 #ifdef USE_AVX
-                __m256 a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
-                __m256 b = AVX_Set(operand.x, operand.y, operand.z, T(), T(), T(), T(), T());
+                __m256      a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
+                __m256      b = AVX_Set(operand.x, operand.y, operand.z, T(), T(), T(), T(), T());
                 __m256 result = AVX_Subtract(a, b);
+
                 return setVector(result);
+
 #elif defined(USE_SSE)
-                __m128 a = SSE_Set(x, y, z, T());
-                __m128 b = SSE_Set(operand.x, operand.y, operand.z, T());
+                __m128      a = SSE_Set(x, y, z, T());
+                __m128      b = SSE_Set(operand.x, operand.y, operand.z, T());
                 __m128 result = SSE_Subtract(a, b);
+
                 return setVector(result);
 #else
-                return Vector(x - operand.x, y - operand.y, z - operand.z);
+                return Vector(
+                    x - operand.x, 
+                    y - operand.y, 
+                    z - operand.z);
 #endif
             }
 
             Vector operator*(T scalar) const noexcept {
 #ifdef USE_AVX
-                __m256 a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
+                __m256      a = AVX_Set(x, y, z);
                 __m256 result = AVX_Multiply(a, scalar);
+
                 return setVector(result);
+
 #elif defined(USE_SSE)
-                __m128 a = SSE_Set(x, y, z, T());
+                __m128      a = SSE_Set(x, y, z);
                 __m128 result = SSE_Multiply(a, scalar);
+
                 return setVector(result);
 #else
-                return Vector(x * scalar, y * scalar, z * scalar);
+                return Vector(
+                    x * scalar, 
+                    y * scalar, 
+                    z * scalar);
 #endif
             }
 
@@ -318,15 +359,23 @@ namespace Spindle {
 
             T dot(const Vector& operand) const noexcept {
 #ifdef USE_AVX
-                __m256 a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
-                __m256 b = AVX_Set(operand.x, operand.y, operand.z, T(), T(), T(), T(), T());
+                __m256 a = AVX_Set(x, y, z);
+                __m256 b = AVX_Set(
+                                  operand.x, 
+                                  operand.y, 
+                                  operand.z);
                 return AVX_Dot(a, b);
 #elif defined(USE_SSE)
-                __m128 a = SSE_Set(x, y, z, T());
-                __m128 b = SSE_Set(operand.x, operand.y, operand.z, T());
+                __m128 a = SSE_Set(x, y, z);
+                __m128 b = SSE_Set(
+                                  operand.x, 
+                                  operand.y, 
+                                  operand.z);
                 return SSE_Dot(a, b);
 #else
-                return x * operand.x + y * operand.y + z * operand.z;
+                return x * operand.x 
+                     + y * operand.y 
+                     + z * operand.z;
 #endif
             }
 
@@ -340,23 +389,32 @@ namespace Spindle {
 
             Vector unitVector() const noexcept {
 #ifdef USE_AVX
-                __m256 a = AVX_Set(x, y, z, T(), T(), T(), T(), T());
+                __m256      a = AVX_Set(x, y, z);
                 __m256 result = AVX_Multiply(a, (1.0f / magnitude()));
+                
                 return setVector(result);
+
 #elif defined(USE_SSE)
-                __m128 a = SSE_Set(x, y, z, T());
+                __m128      a = SSE_Set(x, y, z);
                 __m128 result = SSE_Multiply(a, (1.0f / magnitude()));
+
                 return setVector(result);
 #else
                 T mag = magnitude();
-                return Vector(x / mag, y / mag, z / mag);
+                return Vector(
+                              x / mag,
+                              y / mag, 
+                              z / mag);
 #endif
             }
 
             Vector cross(const Vector& operand) const noexcept {
 #ifdef USE_AVX
-                __m256 a = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-                __m256 b = AVX_Set(operand.x, operand.y, operand.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                __m256 a = AVX_Set(x, y, z);
+                __m256 b = AVX_Set(
+                                   operand.x,
+                                   operand.y,
+                                   operand.z);
 
                 // shuffle components for cross product computation
                 __m256 a_yzx = AVX_ShuffleYZXW(a);
@@ -365,7 +423,9 @@ namespace Spindle {
                 __m256 b_zxy = AVX_ShuffleZXYW(b);
 
                 __m256 cross = AVX_Subtract(AVX_Multiply(a_yzx, b_zxy), AVX_Multiply(a_zxy, b_yzx));
+                
                 return setVector(cross);
+
 #elif defined(USE_SSE)
                 __m128 a = SSE_Set(x, y, z, 0.0f);
                 __m128 b = SSE_Set(operand.x, operand.y, operand.z, 0.0f);
@@ -376,7 +436,10 @@ namespace Spindle {
                 __m128 a_zxy = SSE_ShuffleZXYW(a);
                 __m128 b_zxy = SSE_ShuffleZXYW(b);
 
-                __m128 cross = SSE_Subtract(SSE_Multiply(a_yzx, b_zxy), SSE_Multiply(a_zxy, b_yzx));
+                __m128 cross = SSE_Subtract(
+                    SSE_Multiply(a_yzx, b_zxy), 
+                    SSE_Multiply(a_zxy, b_yzx));
+                
                 return setVector(cross);
 #else
                 return Vector(

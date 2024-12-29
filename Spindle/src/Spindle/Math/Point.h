@@ -73,7 +73,7 @@ namespace Spindle {
             T sum = T();
             for (size_t i = 0; i < Dimension; ++i) {
                 T diff = coordinates[i] - other.coordinates[i];
-                sum += diff * diff;
+                  sum += diff * diff;
             }
             return std::sqrt(sum);
         }
@@ -82,7 +82,7 @@ namespace Spindle {
             T sum = T();
             for (size_t i = 0; i < Dimension; ++i) {
                 T diff = coordinates[i] - other.coordinates[i];
-                sum += diff * diff;
+                  sum += diff * diff;
             }
             return sum;
         }
@@ -98,10 +98,12 @@ namespace Spindle {
         std::string toString() const {
             std::string result = "(";
             for (size_t i = 0; i < Dimension; ++i) {
-                result += std::to_string(coordinates[i]);
-                if (i < Dimension - 1) result += ", ";
+                  result += std::to_string(coordinates[i]);
+                  if (i < Dimension - 1) 
+                      result += ", ";
             }
             result += ")";
+            
             return result;
         }
     };
@@ -115,9 +117,11 @@ namespace Spindle {
         *    constructors     *
         **********************/
 
-        constexpr Point() noexcept : x(0.0f), y(0.0f) {}
+        constexpr Point() noexcept 
+            : x(0.0f), y(0.0f) {}
 
-        Point(float px, float py) noexcept : x(px), y(py) {}
+        Point(float px, float py) noexcept 
+            : x(px), y(py) {}
 
         /**********************
         *  operator overloads *
@@ -125,14 +129,16 @@ namespace Spindle {
 
         Point operator+(const Vector<float, 2>& vec) const noexcept {
 #ifdef USE_AVX
-            __m256 p = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 v = AVX_Set(vec.x, vec.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      p = AVX_Set(x, y);
+            __m256      v = AVX_Set(vec.x, vec.y);
             __m256 result = AVX_Add(p, v);
+
             return Point(AVX_GetX(result), AVX_GetY(result));
 #elif defined(USE_SSE)
-            __m128 p = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 v = SSE_Set(vec.x, vec.y, 0.0f, 0.0f);
+            __m128     p = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128     v = SSE_Set(vec.x, vec.y, 0.0f, 0.0f);
             __m128 result = SSE_Add(p, v);
+
             return Point(SSE_GetX(result), SSE_GetY(result));
 #else
             return Point(x + vec.x, y + vec.y);
@@ -141,14 +147,16 @@ namespace Spindle {
 
         Vector<float, 2> operator-(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256     p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256     p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 result = AVX_Subtract(p1, p2);
+
             return Vector<float, 2>(AVX_GetX(result), AVX_GetY(result));
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            __m128     p1 = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128     p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
             __m128 result = SSE_Subtract(p1, p2);
+
             return Vector<float, 2>(SSE_GetX(result), SSE_GetY(result));
 #else
             return Vector<float, 2>(x - other.x, y - other.y);
@@ -158,15 +166,17 @@ namespace Spindle {
 
         bool operator==(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256  p1 = AVX_Set(x, y);
+            __m256  p2 = AVX_Set(other.x, other.y);
             __m256 cmp = AVX_CompareEqual(p1, p2);
+            
             return AVX_AllTrue(cmp); // Checks if all components are equal
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            __m128  p1 = SSE_Set(x, y);
+            __m128  p2 = SSE_Set(other.x, other.y);
             __m128 cmp = SSE_CompareEqual(p1, p2);
-            return SSE_AllTrue(cmp); // Checks if all components are equal
+            
+            return SSE_AllEqual(cmp);
 #else
             return x == other.x && y == other.y;
 #endif
@@ -175,15 +185,17 @@ namespace Spindle {
 
         bool operator!=(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256  p1 = AVX_Set(x, y);
+            __m256  p2 = AVX_Set(other.x, other.y);
             __m256 cmp = AVX_CompareNotEqual(p1, p2);
-            return AVX_AnyTrue(cmp); // Checks if any component is not equal
+
+            return AVX_AnyEqual(cmp);
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            __m128  p1 = SSE_Set(x, y);
+            __m128  p2 = SSE_Set(other.x, other.y);
             __m128 cmp = SSE_CompareNotEqual(p1, p2);
-            return SSE_AnyTrue(cmp); // Checks if any component is not equal
+            
+            return SSE_AnyTrue(cmp);
 #else
             return !(*this == other);
 #endif
@@ -196,32 +208,37 @@ namespace Spindle {
 
         float distanceTo(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256   p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256   p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 diff = AVX_Subtract(p1, p2);
+            
             return std::sqrt(AVX_Dot(diff, diff));
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            __m128   p1 = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128   p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
             __m128 diff = SSE_Subtract(p1, p2);
+
             return std::sqrt(SSE_Dot(diff, diff));
 #else
             float dx = x - other.x;
             float dy = y - other.y;
+
             return std::sqrt(dx * dx + dy * dy);
 #endif
         }
 
         float distanceSquaredTo(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256   p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256   p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
             __m256 diff = AVX_Subtract(p1, p2);
             return AVX_Dot(diff, diff);
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            __m128   p1 = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128   p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
             __m128 diff = SSE_Subtract(p1, p2);
+
             return SSE_Dot(diff, diff);
 #else
             float dx = x - other.x;
@@ -232,15 +249,15 @@ namespace Spindle {
 
         Point lerp(const Point& other, float t) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 tVec = AVX_Set(t);
+            __m256     p1 = AVX_Set(x, y);
+            __m256     p2 = AVX_Set(other.x, other.y);
+            __m256   tVec = AVX_Set(t);
             __m256 result = AVX_Add(p1, AVX_Multiply(AVX_Subtract(p2, p1), tVec));
             return setPoint(result);
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
-            __m128 tVec = _mm_set1_ps(t);
+            __m128     p1 = SSE_Set(x, y);
+            __m128     p2 = SSE_Set(other.x, other.y);
+            __m128   tVec = SSE_Set(t);
             __m128 result = SSE_Add(p1, SSE_Multiply(SSE_Subtract(p2, p1), tVec));
             return setPoint(result);
 #else
@@ -259,7 +276,9 @@ namespace Spindle {
         }
 
         std::string toString() const {
-            return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
+            return "(" + std::to_string(x) + 
+                   ", " + std::to_string(y) + 
+                                          ")";
         }
     };
 
@@ -271,9 +290,11 @@ namespace Spindle {
         *    constructors     *
         **********************/
 
-        constexpr Point() noexcept : x(0.0f), y(0.0f), z(0.0f) {}
+        constexpr Point() noexcept 
+            : x(0.0f), y(0.0f), z(0.0f) {}
 
-        Point(float px, float py, float pz) noexcept : x(px), y(py), z(pz) {}
+        Point(float px, float py, float pz) noexcept 
+            : x(px), y(py), z(pz) {}
 
         /**********************
         *  operator overloads *
@@ -281,15 +302,17 @@ namespace Spindle {
 
         Point operator+(const Vector<float, 3>& vec) const noexcept {
 #ifdef USE_AVX
-            __m256 p = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 v = AVX_Set(vec.x, vec.y, vec.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256      p = AVX_Set(x, y, z);
+            __m256      v = AVX_Set(vec.x, vec.y, vec.z);
             __m256 result = AVX_Add(p, v);
-            return Point(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+
+            return setPoint(result);
 #elif defined(USE_SSE)
-            __m128 p = SSE_Set(x, y, z, 0.0f);
-            __m128 v = SSE_Set(vec.x, vec.y, vec.z, 0.0f);
+            __m128      p = SSE_Set(x, y, z);
+            __m128      v = SSE_Set(vec.x, vec.y, vec.z);
             __m128 result = SSE_Add(p, v);
-            return Point(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
+
+            return setPoint(result);
 #else
             return Point(x + vec.x, y + vec.y, z + vec.z);
 #endif
@@ -298,14 +321,17 @@ namespace Spindle {
 
         Vector<float, 3> operator-(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256     p1 = AVX_Set(x, y, z);
+            __m256     p2 = AVX_Set(other.x, other.y, other.z);
             __m256 result = AVX_Subtract(p1, p2);
+
             return Vector<float, 3>(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, z, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128     p1 = SSE_Set(x, y, z);
+            __m128     p2 = SSE_Set(other.x, other.y, other.z);
             __m128 result = SSE_Subtract(p1, p2);
+
             return Vector<float, 3>(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
 #else
             return Vector<float, 3>(x - other.x, y - other.y, z - other.z);
@@ -315,15 +341,18 @@ namespace Spindle {
 
         bool operator==(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 p1 = AVX_Set(x, y, z);
+            __m256 p2 = AVX_Set(other.x, other.y, other.z);
             __m256 cmp = AVX_CompareEqual(p1, p2);
+            
             return AVX_AllTrue(cmp);
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, z, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128  p1 = SSE_Set(x, y, z);
+            __m128  p2 = SSE_Set(other.x, other.y, other.z);
             __m128 cmp = SSE_CompareEqual(p1, p2);
-            return SSE_AllTrue(cmp);
+
+            return SSE_AllEqual(cmp);
 #else
             return x == other.x && y == other.y && z == other.z;
 #endif
@@ -331,14 +360,17 @@ namespace Spindle {
 
         bool operator!=(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256  p1 = AVX_Set(x, y, z);
+            __m256  p2 = AVX_Set(other.x, other.y, other.z);
             __m256 cmp = AVX_CompareNotEqual(p1, p2);
-            return AVX_AnyTrue(cmp);
+            
+            return AVX_AnyEqual(cmp);
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, z, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128  p1 = SSE_Set(x, y, z);
+            __m128  p2 = SSE_Set(other.x, other.y, other.z,);
             __m128 cmp = SSE_CompareNotEqual(p1, p2);
+            
             return SSE_AnyTrue(cmp);
 #else
             return !(*this == other);
@@ -352,59 +384,73 @@ namespace Spindle {
 
         float distanceTo(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256   p1 = AVX_Set(x, y, z);
+            __m256   p2 = AVX_Set(other.x, other.y, other.z);
             __m256 diff = AVX_Subtract(p1, p2);
-            return std::sqrt(AVX_Dot(diff, diff));
+
+            return std::sqrt(AVX_Dot(diff));
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, z, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128   p1 = SSE_Set(x, y, z);
+            __m128   p2 = SSE_Set(other.x, other.y, other.z);
             __m128 diff = SSE_Subtract(p1, p2);
-            return std::sqrt(SSE_Dot(diff, diff));
+            
+            return std::sqrt(SSE_Dot(diff));
 #else
             float dx = x - other.x;
             float dy = y - other.y;
             float dz = z - other.z;
+
             return std::sqrt(dx * dx + dy * dy + dz * dz);
 #endif
         }
 
         float distanceSquaredTo(const Point& other) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256   p1 = AVX_Set(x, y, z);
+            __m256   p2 = AVX_Set(other.x, other.y, other.z);
             __m256 diff = AVX_Subtract(p1, p2);
-            return AVX_Dot(diff, diff);
+
+            return AVX_Dot(diff);
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, z, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128   p1 = SSE_Set(x, y, z);
+            __m128   p2 = SSE_Set(other.x, other.y, other.z);
             __m128 diff = SSE_Subtract(p1, p2);
-            return SSE_Dot(diff, diff);
+
+            return SSE_Dot(diff);
 #else
             float dx = x - other.x;
             float dy = y - other.y;
             float dz = z - other.z;
+            
             return dx * dx + dy * dy + dz * dz;
 #endif
         }
 
         Point lerp(const Point& other, float t) const noexcept {
 #ifdef USE_AVX
-            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            __m256 tVec = AVX_Set(t);
-            __m256 result = AVX_Add(p1, AVX_Multiply(AVX_Subtract(p2, p1), tVec));
+            __m256     p1 = AVX_Set(x, y, z);
+            __m256     p2 = AVX_Set(other.x, other.y, other.z);
+            __m256   tVec = AVX_Set(t);
+            __m256 result = AVX_Add(p1, 
+                AVX_Multiply(AVX_Subtract(p2, p1), tVec));
+
             return setPoint(result);
+
 #elif defined(USE_SSE)
-            __m128 p1 = SSE_Set(x, y, z, 0.0f);
-            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
-            __m128 tVec = _mm_set1_ps(t);
-            __m128 result = SSE_Add(p1, SSE_Multiply(SSE_Subtract(p2, p1), tVec));
+            __m128     p1 = SSE_Set(x, y, z);
+            __m128     p2 = SSE_Set(other.x, other.y, other.z);
+            __m128   tVec = _mm_set1_ps(t);
+            __m128 result = SSE_Add(p1, 
+                SSE_Multiply(SSE_Subtract(p2, p1), tVec));
+
             return setPoint(result);
 #else
             float nx = x + (other.x - x) * t;
             float ny = y + (other.y - y) * t;
             float nz = z + (other.z - z) * t;
+
             return Point(nx, ny, nz);
 #endif
         }

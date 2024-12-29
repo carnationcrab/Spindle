@@ -59,7 +59,7 @@ namespace Spindle {
         return _mm256_testc_ps(cmp, _mm256_set1_ps(-1.0f));
     }
 
-    inline bool AVX_AnyTrue(__m256 cmp) {
+    inline bool AVX_AnyEqual(__m256 cmp) {
         return !_mm256_testz_ps(cmp, _mm256_set1_ps(-1.0f));
     }
 
@@ -232,6 +232,21 @@ namespace Spindle {
 
         return AVX_GetScalar(sum);
     }
+
+    // computes the dot product of two vectors
+    inline float AVX_Dot(__m256 a) noexcept {
+        __m256 multResult = AVX_Multiply(a, a);
+
+        __m128    lowHalf = AVX_GetFirst128(multResult);   // low 128 bits
+        __m128   highHalf = AVX_GetLast128(multResult);    // high 128 bits
+        __m128        sum = AVX_Add(lowHalf, highHalf);
+
+        sum = AVX_HorizontalAdd(sum, sum);
+        sum = AVX_HorizontalAdd(sum, sum);
+
+        return AVX_GetScalar(sum);
+    }
+
 
     // computes the dot product for two large arrays
     inline float AVX_Dot(const float* a, const float* b, size_t count) noexcept {

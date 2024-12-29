@@ -57,20 +57,26 @@ namespace Spindle {
         **********************/
 
         // addition
-        constexpr Matrix<T, N, M> operator+(const Matrix<T, N, M>& operand) const noexcept {
+        constexpr Matrix<T, N, M> operator+(
+            const Matrix<T, N, M>& operand) const noexcept {
             Matrix<T, N, M> result;
+
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
                     result.at(i, j) = this->at(i, j) + operand.at(i, j);
+            
             return result;
         }
 
         // subtraction
-        constexpr Matrix<T, N, M> operator-(const Matrix<T, N, M>& operand) const noexcept {
+        constexpr Matrix<T, N, M> operator-(
+            const Matrix<T, N, M>& operand) const noexcept {
             Matrix<T, N, M> result;
+
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
                     result.at(i, j) = this->at(i, j) - operand.at(i, j);
+            
             return result;
         }
 
@@ -123,7 +129,7 @@ namespace Spindle {
         Matrix() noexcept {
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
-                    data[i][j] = 0.0f;
+                    ata[i][j] = 0.0f;
         }
 
         Matrix(const std::initializer_list<std::initializer_list<float>>& values) noexcept {
@@ -153,7 +159,7 @@ namespace Spindle {
         Matrix<float, N, M> operator+(const Matrix<float, N, M>& operand) const noexcept {
 #ifdef USE_AVX
             Matrix<float, N, M> result;
-            for (size_t i = 0; i < N; ++i) {
+            for  (size_t i = 0; i < N; ++i) {
                 __m256   a = AVX_Set(data[i][0], data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
                 __m256   b = AVX_Set(operand.data[i][0], operand.data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
                 __m256 res = AVX_Add(a, b);
@@ -164,7 +170,7 @@ namespace Spindle {
             return result;
 #elif defined(USE_SSE)
             Matrix<float, N, M> result;
-            for (size_t i = 0; i < N; ++i) {
+            for  (size_t i = 0; i < N; ++i) {
                 __m128   a = SSE_Set(data[i][0], data[i][1], 0.0f, 0.0f);
                 __m128   b = SSE_Set(operand.data[i][0], operand.data[i][1], 0.0f, 0.0f);
                 __m128 res = SSE_Add(a, b);
@@ -175,31 +181,40 @@ namespace Spindle {
             return result;
 #else
             Matrix<float, N, M> result;
+
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
-                    result.data[i][j] = data[i][j] + operand.data[i][j];
+                    result.data[i][j] = 
+                    data[i][j] + operand.data[i][j];
+
             return result;
 #endif
         }
 
         // SIMD subtraction
-        Matrix<float, N, M> operator-(const Matrix<float, N, M>& operand) const noexcept {
+        Matrix<float, N, M> operator-(
+            const Matrix<float, N, M>& operand) const noexcept {
 #ifdef USE_AVX
             Matrix<float, N, M> result;
+
             for (size_t i = 0; i < N; ++i) {
-                __m256 a = AVX_Set(data[i][0], data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-                __m256 b = AVX_Set(operand.data[i][0], operand.data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                __m256   a = AVX_Set(data[i][0], data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+                __m256   b = AVX_Set(operand.data[i][0], operand.data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
                 __m256 res = AVX_Subtract(a, b);
+
                 result.data[i][0] = AVX_GetX(res);
                 result.data[i][1] = AVX_GetY(res);
             }
             return result;
+
 #elif defined(USE_SSE)
             Matrix<float, N, M> result;
+
             for (size_t i = 0; i < N; ++i) {
-                __m128 a = SSE_Set(data[i][0], data[i][1], 0.0f, 0.0f);
-                __m128 b = SSE_Set(operand.data[i][0], operand.data[i][1], 0.0f, 0.0f);
+                __m128   a = SSE_Set(data[i][0], data[i][1], 0.0f, 0.0f);
+                __m128   b = SSE_Set(operand.data[i][0], operand.data[i][1], 0.0f, 0.0f);
                 __m128 res = SSE_Subtract(a, b);
+
                 result.data[i][0] = SSE_GetX(res);
                 result.data[i][1] = SSE_GetY(res);
             }
@@ -208,7 +223,9 @@ namespace Spindle {
             Matrix<float, N, M> result;
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
-                    result.data[i][j] = data[i][j] - operand.data[i][j];
+                    result.data[i][j] = 
+                    data[i][j] - operand.data[i][j];
+
             return result;
 #endif
         }
@@ -217,27 +234,31 @@ namespace Spindle {
         Matrix<float, N, M> operator*(float scalar) const noexcept {
 #ifdef USE_AVX
             Matrix<float, N, M> result;
-            for (size_t i = 0; i < N; ++i) {
-                __m256 a = AVX_Set(data[i][0], data[i][1], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            for  (size_t i = 0; i < N; ++i) {
+                __m256   a = AVX_Set(data[i][0], data[i][1]);
                 __m256 res = AVX_Multiply(a, scalar);
+
                 result.data[i][0] = AVX_GetX(res);
                 result.data[i][1] = AVX_GetY(res);
             }
             return result;
 #elif defined(USE_SSE)
             Matrix<float, N, M> result;
-            for (size_t i = 0; i < N; ++i) {
-                __m128 a = SSE_Set(data[i][0], data[i][1], 0.0f, 0.0f);
+            for  (size_t i = 0; i < N; ++i) {
+                __m128   a = SSE_Set(data[i][0], data[i][1]);
                 __m128 res = SSE_Multiply(a, scalar);
                 result.data[i][0] = SSE_GetX(res);
                 result.data[i][1] = SSE_GetY(res);
             }
+
             return result;
+
 #else
             Matrix<float, N, M> result;
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
                     result.data[i][j] = data[i][j] * scalar;
+
             return result;
 #endif
         }
@@ -247,15 +268,20 @@ namespace Spindle {
         **********************/
 
         Matrix<float, M, N> transpose() const noexcept {
+
             Matrix<float, M, N> result;
+
             for (size_t i = 0; i < N; ++i)
                 for (size_t j = 0; j < M; ++j)
                     result.at(j, i) = this->at(i, j);
+
             return result;
         }
 
         std::string toString() const noexcept {
+
             std::ostringstream oss;
+
             for (size_t i = 0; i < N; ++i) {
                 oss << "[ ";
                 for (size_t j = 0; j < M; ++j) {
