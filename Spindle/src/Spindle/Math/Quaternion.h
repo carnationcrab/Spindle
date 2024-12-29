@@ -230,18 +230,21 @@ namespace Spindle {
             // dot product (for w' component)
             __m256    dot = AVX_Multiply(q1, q2);             
             __m256 dotSum = AVX_HorizontalAdd(dot);
+            
+            float w1 = AVX_GetW(q1);
+            float x1 = AVX_GetX(q1);
+            float y1 = AVX_GetY(q1);
+            float z1 = AVX_GetZ(q1);
 
-            float resultX = AVX_GetW(q1) * AVX_GetX(q2) + AVX_GetX(q1) * AVX_GetW(q2) +
-                            AVX_GetY(q1) * AVX_GetZ(q2) - AVX_GetZ(q1) * AVX_GetY(q2);
+            float w2 = AVX_GetW(q2);
+            float x2 = AVX_GetX(q2);
+            float y2 = AVX_GetY(q2);
+            float z2 = AVX_GetZ(q2);
 
-            float resultY = AVX_GetW(q1) * AVX_GetY(q2) - AVX_GetX(q1) * AVX_GetZ(q2) +
-                            AVX_GetY(q1) * AVX_GetW(q2) + AVX_GetZ(q1) * AVX_GetX(q2);
-
-            float resultZ = AVX_GetW(q1) * AVX_GetZ(q2) + AVX_GetX(q1) * AVX_GetY(q2) -
-                            AVX_GetY(q1) * AVX_GetX(q2) + AVX_GetZ(q1) * AVX_GetW(q2);
-
-            float resultW = AVX_GetW(q1) * AVX_GetW(q2) - AVX_GetX(q1) * AVX_GetX(q2) -
-                            AVX_GetY(q1) * AVX_GetY(q2) - AVX_GetZ(q1) * AVX_GetZ(q2);
+            float resultX = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
+            float resultY = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
+            float resultZ = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
+            float resultW = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
 
             return Quaternion<float>(resultX, resultY, resultZ, resultW);
 
@@ -259,10 +262,20 @@ namespace Spindle {
             __m128    dot = SSE_Multiply(q1, q2);
             __m128 dotSum = SSE_HorizontalAdd(dot);
 
-            float resultX = SSE_GetX(cross) + SSE_GetW(dot) - SSE_GetY(cross);
-            float resultY = SSE_GetY(cross) - SSE_GetZ(cross) + SSE_GetW(cross) + SSE_GetX(cross);
-            float resultZ = SSE_GetZ(cross) + SSE_GetY(dot) - SSE_GetX(cross) + SSE_GetW(cross);
-            float resultW = SSE_GetW(dot) - SSE_GetX(dot) - SSE_GetY(dot) - SSE_GetZ(dot);
+            float w1 = SSE_GetW(q1);
+            float x1 = SSE_GetX(q1);
+            float y1 = SSE_GetY(q1);
+            float z1 = SSE_GetZ(q1);
+                       SSE
+            float w2 = SSE_GetW(q2);
+            float x2 = SSE_GetX(q2);
+            float y2 = SSE_GetY(q2);
+            float z2 = SSE_GetZ(q2);
+
+            float resultX = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
+            float resultY = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
+            float resultZ = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
+            float resultW = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
 
             return Quaternion<float>(resultX, resultY, resultZ, resultW);
 
