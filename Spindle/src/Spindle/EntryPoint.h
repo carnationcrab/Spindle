@@ -11,6 +11,7 @@
 #include "Test/MatrixTests.cpp"
 #include "Test/QuaternionTests.cpp"
 #include "Test/LineTests.cpp"
+#include "Test/RayTests.cpp"
 
 #ifdef SPINDLE_PLATFORM_WINDOWS
 
