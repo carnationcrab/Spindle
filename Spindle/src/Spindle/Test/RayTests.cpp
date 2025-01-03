@@ -56,5 +56,5 @@ TEST_CASE(Ray_ToString) {
     Ray<float, 3> ray(origin, direction);
 
     std::string expected = "Ray(Line(point: (1.000000, 2.000000, 3.000000), Direction: (1.000000, 0.000000, 0.000000)))";
-    SpindleTest::assertEqual(ray.ToString(), expected, "toString should produce the correct string representation of the ray");
+    SpindleTest::assertEqual(ray.toString(), expected, "toString should produce the correct string representation of the ray");
 }

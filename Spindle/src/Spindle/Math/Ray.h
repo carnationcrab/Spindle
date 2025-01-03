@@ -34,7 +34,7 @@ namespace Spindle {
         Point<T, Dimension> getPoint(T t) const noexcept {
             assert(t >= 0.0 && t <= 1.0 && "parameter t must be in the range [0, 1] for a line segment.");
 
-            // in production, clamp the value
+            // TODO in production, clamp the value
             // t = std::max(T(0.0), std::min(t, T(1.0)));
 
             return line.getPoint(t);
@@ -53,7 +53,7 @@ namespace Spindle {
         *      utilities      *
         **********************/
 
-        std::string ToString() const {
+        std::string toString() const {
             return "Ray(" + line.toString() + ")";
         }
     };
@@ -89,7 +89,6 @@ namespace Spindle {
             return line.getPoint(t);
         }
 
-        // checks if two rays are equal
         bool operator==(const Ray& other) const noexcept {
             return line == other.line;
         }
@@ -102,8 +101,8 @@ namespace Spindle {
         *      utilities      *
         **********************/
 
-        std::string ToString() const {
-            return "Ray(" + line.ToString() + ")";
+        std::string toString() const {
+            return "Ray(" + line.toString() + ")";
         }
     };
 }
