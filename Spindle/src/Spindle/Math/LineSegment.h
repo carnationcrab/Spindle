@@ -187,8 +187,8 @@ namespace Spindle {
         **********************/
 
         std::string toString() const {
-            return "LineSegment(Start: " + start.ToString() + ", End: " + end.ToString() + ")";
+            return "LineSegment(Start: " + start.toString() + ", End: " + end.toString() + ")";
         }
     };
 
-} // namespace Spindle
+}

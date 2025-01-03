@@ -275,7 +275,7 @@ namespace Spindle {
             return Point(SSE_GetX(result), SSE_GetY(result));
         }
 
-        std::string ToString() const {
+        std::string toString() const {
             return "(" + std::to_string(x) + 
                    ", " + std::to_string(y) + 
                                           ")";

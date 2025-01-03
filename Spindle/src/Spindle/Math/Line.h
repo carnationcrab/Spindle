@@ -54,8 +54,8 @@ namespace Spindle {
         *      utilities      *
         **********************/
 
-        std::string ToString() const {
-            return "Line(point: " + point.ToString() + ", Direction: " + direction.ToString() + ")";
+        std::string toString() const {
+            return "Line(point: " + point.toString() + ", Direction: " + direction.toString() + ")";
         }
     };
 
@@ -133,8 +133,8 @@ namespace Spindle {
         *      utilities      *
         **********************/
 
-        std::string ToString() const {
-            return "Line(point: " + point.ToString() + ", Direction: " + direction.ToString() + ")";
+        std::string toString() const {
+            return "Line(point: " + point.toString() + ", Direction: " + direction.toString() + ")";
         }
     };
 
