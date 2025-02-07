@@ -89,9 +89,9 @@ namespace SpindleTest {
 
         bool runSingleTest(const std::string& testName, const TestFunction& testFn) {
             try {
-                SPINDLE_TEST_INFO("STARTING: {}", testName);
+                SPINDLE_TEST_INFO(">>> {} <<<", testName);
                 testFn();
-                SPINDLE_TEST_PASS("{}: PASSED\n", testName);
+                SPINDLE_TEST_PASS("{}: PASSED", testName);
                 return true;
             }
             catch (const std::exception& e) {

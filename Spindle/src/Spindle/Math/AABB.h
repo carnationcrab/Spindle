@@ -247,19 +247,10 @@ namespace Spindle {
         **********************/
         bool isValid() const noexcept {
 #ifdef USE_AVX
-            SPINDLE_TEST_INFO("pmin: {}", AVX_ToString(pmin));
-            SPINDLE_TEST_INFO("pmax: {}", AVX_ToString(pmax));
-
-            // Ensure all components satisfy pmin <= pmax
+            // ensure all components satisfy pmin <= pmax
             bool valid = AVX_IsLessEqual(pmin, pmax);
-            SPINDLE_TEST_INFO("pmax: {}", AVX_ToString(pmax));
-
-
-            if (!valid) {
-                SPINDLE_TEST_INFO("isValid failed sanity check for pmin: {} and pmax: {}", AVX_ToString(pmin), AVX_ToString(pmax));
-            }
-
             return valid;
+
 #elif defined(USE_SSE)
             SPINDLE_TEST_INFO("pmin: {}", SSE_ToString(pmin));
             SPINDLE_TEST_INFO("pmax: {}", SSE_ToString(pmax));
@@ -320,9 +311,6 @@ namespace Spindle {
             bool minCheck = AVX_AllTrue(cmpMin);
             bool maxCheck = AVX_AllTrue(cmpMax);
 
-            SPINDLE_TEST_INFO("cmpMin Logical Result = {}", AVX_ToString(cmpMin));
-            SPINDLE_TEST_INFO("cmpMax Logical Result = {}", AVX_ToString(cmpMax));
-
             return minCheck && maxCheck;
 
 #elif defined(USE_SSE)
@@ -351,7 +339,6 @@ namespace Spindle {
         Point<float, 3> center() const noexcept {
 #ifdef USE_AVX
             __m256 mid = AVX_Multiply(AVX_Add(pmin, pmax), 0.5f);
-            SPINDLE_TEST_INFO("center: {}", AVX_ToString(mid));
             return Point<float, 3>(AVX_GetX(mid), AVX_GetY(mid), AVX_GetZ(mid));
 #elif defined(USE_SSE)
             __m128 mid = SSE_Multiply(SSE_Add(pmin, pmax), 0.5f);
@@ -365,7 +352,6 @@ namespace Spindle {
         float volume() const noexcept {
 #ifdef USE_AVX
             __m256 size = AVX_Subtract(pmax, pmin);
-            SPINDLE_TEST_INFO("size: {}", AVX_ToString(size));
             return AVX_GetX(size) * AVX_GetY(size) * AVX_GetZ(size);
 #elif defined(USE_SSE)
             __m128 size = SSE_Subtract(pmax, pmin);
@@ -382,12 +368,10 @@ namespace Spindle {
             __m256 p = AVX_Set(point.x, point.y, point.z, 0.0f);
             pmin = AVX_Min(pmin, p);
             pmax = AVX_Max(pmax, p);
-            SPINDLE_TEST_INFO("Expanded pmin: {}, pmax: {}", AVX_ToString(pmin), AVX_ToString(pmax));
 #elif defined(USE_SSE)
             __m128 p = SSE_Set(point.x, point.y, point.z, 0.0f);
             pmin = SSE_Min(pmin, p);
             pmax = SSE_Max(pmax, p);
-            SPINDLE_TEST_INFO("Expanded pmin: {}, pmax: {}", SSE_ToString(pmin), SSE_ToString(pmax));
 #else
             setMin(Point<float, 3>(std::min(getMin().x, point.x), std::min(getMin().y, point.y), std::min(getMin().z, point.z)));
             setMax(Point<float, 3>(std::max(getMax().x, point.x), std::max(getMax().y, point.y), std::max(getMax().z, point.z)));
@@ -398,7 +382,6 @@ namespace Spindle {
 #ifdef USE_AVX
             pmin = AVX_Min(pmin, other.pmin);
             pmax = AVX_Max(pmax, other.pmax);
-            SPINDLE_TEST_INFO("Expanded to include AABB. pmin: {}, pmax: {}", AVX_ToString(pmin), AVX_ToString(pmax));
 #elif defined(USE_SSE)
             pmin = SSE_Min(pmin, other.pmin);
             pmax = SSE_Max(pmax, other.pmax);

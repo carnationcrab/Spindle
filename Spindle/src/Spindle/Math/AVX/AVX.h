@@ -138,15 +138,12 @@ namespace Spindle {
     inline __m256 AVX_CompareLessEqual(__m256 a, __m256 b) {
         // Perform the comparison
         __m256 cmpResult = _mm256_cmp_ps(a, b, _CMP_LE_OQ);
+        return cmpResult;
+    }
 
-        SPINDLE_TEST_INFO("compareLessEqual: a = {}", AVX_ToString(a));
-        SPINDLE_TEST_INFO("compareLessEqual: b = {}", AVX_ToString(b));
-        SPINDLE_TEST_INFO("compareLessEqual Raw Result = {}", AVX_ToString(cmpResult));
-
-        // Convert result to logical boolean (1.0f for true, 0.0f for false)
-        //__m256 logicalResult = _mm256_and_ps(cmpResult, _mm256_set1_ps(1.0f));
-        //SPINDLE_TEST_INFO("compareLessEqual Logical Result = {}", AVX_ToString(logicalResult));
-
+    inline __m256 AVX_CompareGreaterEqual(__m256 a, __m256 b) {
+        // Perform the comparison
+        __m256 cmpResult = _mm256_cmp_ps(a, b, _CMP_GE_OQ);
         return cmpResult;
     }
 
@@ -154,23 +151,6 @@ namespace Spindle {
         __m256 cmpResult = AVX_CompareLessEqual(a, b);
         return _mm256_movemask_ps(cmpResult) != 0;
     }
-
-    inline __m256 AVX_CompareGreaterEqual(__m256 a, __m256 b) {
-        // Perform the comparison
-        __m256 cmpResult = _mm256_cmp_ps(a, b, _CMP_GE_OQ);
-
-        // Debug: Log the raw comparison result
-        SPINDLE_TEST_INFO("compareGreaterEqual: a = {}", AVX_ToString(a));
-        SPINDLE_TEST_INFO("compareGreaterEqual: b = {}", AVX_ToString(b));
-        SPINDLE_TEST_INFO("compareGreaterEqual Raw Result = {}", AVX_ToString(cmpResult));
-
-        //// Convert result to logical boolean (1.0f for true, 0.0f for false)
-        //__m256 logicalResult = _mm256_and_ps(cmpResult, _mm256_set1_ps(1.0f));
-        //SPINDLE_TEST_INFO("compareGreaterEqual Logical Result = {}", AVX_ToString(logicalResult));
-
-        return cmpResult;
-    }
-
 
     inline __m256 AVX_CompareNaN(__m256 a) {
         return _mm256_cmp_ps(a, a, _CMP_UNORD_Q); // Returns true if NaN
