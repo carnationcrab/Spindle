@@ -72,6 +72,18 @@ namespace Spindle {
     *         comparison          *
     ******************************/
 
+    inline __m128 SSE_Min(__m128 a, __m128 b) {
+        return _mm_min_ps(a, b);
+    }
+
+    inline __m128 SSE_Max(__m128 a, __m128 b) {
+        return _mm_max_ps(a, b);
+    }
+
+    inline bool SSE_AllEqual(__m128 cmp) {
+        return _mm_movemask_ps(cmp) == 0xF;
+    }
+
     inline __m128 SSE_CompareEqual(__m128 a, __m128 b) {
         return _mm_cmpeq_ps(a, b);
     }
@@ -80,21 +92,58 @@ namespace Spindle {
         return _mm_cmpneq_ps(a, b);
     }
 
-    inline bool SSE_AllEqual(__m128 cmp) {
-        return _mm_movemask_ps(cmp) == 0xF; // All bits set
+    inline __m128 SSE_CompareNaN(__m128 a) {
+        return _mm_cmpunord_ps(a, a); // Returns true if NaN
     }
 
-    inline bool SSE_AnyTrue(__m128 cmp) {
-        return _mm_movemask_ps(cmp) != 0x0; // At least one bit set
+    // compare less equal
+    inline __m128 SSE_CompareLessEqual(__m128 a, __m128 b) {
+        return _mm_cmple_ps(a, b);
     }
 
-    // compares against itself
+    inline bool SSE_IsLessEqual(__m128 a, __m128 b) {
+        __m128 cmpResult = _mm_cmple_ps(a, b);
+        return _mm_movemask_ps(cmpResult) != 0;
+    }
+
+    // compare greater equal
+    inline __m128 SSE_CompareGreaterEqual(__m128 a, __m128 b) {
+        return _mm_cmpge_ps(a, b);
+    }
+
     inline __m128 SSE_CompareOrder(__m128 a) noexcept {
         return _mm_cmpord_ss(a, a);
     }
 
     inline __m128 SSE_CompareOrder(__m128 a, __m128 b) noexcept {
         return _mm_cmpord_ss(a, b);
+    }
+
+    inline bool SSE_AllTrue(__m128 mask) {
+        return _mm_movemask_ps(mask) == 0xF;
+    }
+
+    inline bool SSE_AnyTrue(__m128 mask) {
+        return _mm_movemask_ps(mask) != 0x0;
+    }
+
+    // logical AND
+    inline __m128 SSE_And(__m128 a, __m128 b) {
+        return _mm_and_ps(a, b);
+    }
+
+    // logical OR
+    inline __m128 SSE_Or(__m128 a, __m128 b) {
+        return _mm_or_ps(a, b);
+    }
+
+    inline __m128 SSE_AndOr(__m128 andMask, __m128 orMask, __m128 input) {
+        __m128 andResult = _mm_and_ps(andMask, input);
+        return _mm_or_ps(andResult, orMask); 
+    }
+
+    inline __m128 SSE_AndNot(__m128 notMask, __m128 input) {
+        return _mm_andnot_ps(notMask, input);
     }
 
     /******************************

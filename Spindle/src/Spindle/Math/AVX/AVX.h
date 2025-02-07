@@ -3,6 +3,7 @@
 #include <immintrin.h> // AVX intrinsics
 #include <string>
 #include <sstream>
+#include "../../Log.h"
 
 // AVX utilities for 256-bit SIMD operations
 namespace Spindle {
@@ -39,30 +40,9 @@ namespace Spindle {
         _mm256_store_ps(data, v);
     }
 
-    /******************************
-    *         comparison          *
-    ******************************/
-
-    inline __m256 SSE_SetZero() {
+    inline __m256 AVX_SetZero() {
         return _mm256_setzero_ps();
     }
-
-    inline __m256 AVX_CompareEqual(__m256 a, __m256 b) {
-        return _mm256_cmp_ps(a, b, _CMP_EQ_OQ);
-    }
-
-    inline __m256 AVX_CompareNotEqual(__m256 a, __m256 b) {
-        return _mm256_cmp_ps(a, b, _CMP_NEQ_OQ);
-    }
-
-    inline bool AVX_AllTrue(__m256 cmp) {
-        return _mm256_testc_ps(cmp, _mm256_set1_ps(-1.0f));
-    }
-
-    inline bool AVX_AnyEqual(__m256 cmp) {
-        return !_mm256_testz_ps(cmp, _mm256_set1_ps(-1.0f));
-    }
-
 
     /******************************
     *          utilities          *
@@ -134,6 +114,96 @@ namespace Spindle {
         return oss.str();
     }
 
+
+    /******************************
+    *         comparison          *
+    ******************************/
+    
+    inline __m256 AVX_Min(__m256 a, __m256 b) {
+        return _mm256_min_ps(a, b);
+    }
+
+    inline __m256 AVX_Max(__m256 a, __m256 b) {
+        return _mm256_max_ps(a, b);
+    }
+
+    inline __m256 AVX_CompareEqual(__m256 a, __m256 b) {
+        return _mm256_cmp_ps(a, b, _CMP_EQ_OQ);
+    }
+
+    inline __m256 AVX_CompareNotEqual(__m256 a, __m256 b) {
+        return _mm256_cmp_ps(a, b, _CMP_NEQ_OQ);
+    }
+
+    inline __m256 AVX_CompareLessEqual(__m256 a, __m256 b) {
+        // Perform the comparison
+        __m256 cmpResult = _mm256_cmp_ps(a, b, _CMP_LE_OQ);
+
+        SPINDLE_TEST_INFO("compareLessEqual: a = {}", AVX_ToString(a));
+        SPINDLE_TEST_INFO("compareLessEqual: b = {}", AVX_ToString(b));
+        SPINDLE_TEST_INFO("compareLessEqual Raw Result = {}", AVX_ToString(cmpResult));
+
+        // Convert result to logical boolean (1.0f for true, 0.0f for false)
+        //__m256 logicalResult = _mm256_and_ps(cmpResult, _mm256_set1_ps(1.0f));
+        //SPINDLE_TEST_INFO("compareLessEqual Logical Result = {}", AVX_ToString(logicalResult));
+
+        return cmpResult;
+    }
+
+    inline bool AVX_IsLessEqual(__m256 a, __m256 b) {
+        __m256 cmpResult = AVX_CompareLessEqual(a, b);
+        return _mm256_movemask_ps(cmpResult) != 0;
+    }
+
+    inline __m256 AVX_CompareGreaterEqual(__m256 a, __m256 b) {
+        // Perform the comparison
+        __m256 cmpResult = _mm256_cmp_ps(a, b, _CMP_GE_OQ);
+
+        // Debug: Log the raw comparison result
+        SPINDLE_TEST_INFO("compareGreaterEqual: a = {}", AVX_ToString(a));
+        SPINDLE_TEST_INFO("compareGreaterEqual: b = {}", AVX_ToString(b));
+        SPINDLE_TEST_INFO("compareGreaterEqual Raw Result = {}", AVX_ToString(cmpResult));
+
+        //// Convert result to logical boolean (1.0f for true, 0.0f for false)
+        //__m256 logicalResult = _mm256_and_ps(cmpResult, _mm256_set1_ps(1.0f));
+        //SPINDLE_TEST_INFO("compareGreaterEqual Logical Result = {}", AVX_ToString(logicalResult));
+
+        return cmpResult;
+    }
+
+
+    inline __m256 AVX_CompareNaN(__m256 a) {
+        return _mm256_cmp_ps(a, a, _CMP_UNORD_Q); // Returns true if NaN
+    }
+
+    inline bool AVX_AllTrue(__m256 cmp) {
+        // extracts the sign bits of all lanes and check if all are set to 1
+        int mask = _mm256_movemask_ps(cmp);
+        return mask == 0xFF; // 0xFF means all 8 lanes are true
+    }
+
+    inline bool AVX_AnyTrue(__m256 mask) {
+        return _mm256_movemask_ps(mask) != 0x00;
+    }
+
+    inline bool AVX_AnyEqual(__m256 cmp) {
+        return !_mm256_testz_ps(cmp, _mm256_set1_ps(-1.0f));
+    }
+
+    // logical AND
+    inline __m256 AVX_And(__m256 a, __m256 b) {
+        return _mm256_and_ps(a, b);
+    }
+
+    // logical OR
+    inline __m256 AVX_Or(__m256 a, __m256 b) {
+        return _mm256_or_ps(a, b);
+    }
+
+    inline __m256 AVX_AndNot(__m256 notMask, __m256 input) {
+        return _mm256_andnot_ps(notMask, input);
+    }
+
     /******************************
     *          methods            *
     ******************************/
@@ -189,7 +259,7 @@ namespace Spindle {
 #ifdef __FMA__
         return _mm256_fnmadd_ps(a, b, c);
 #else
-        return AVX_Add(AVX_Subtract(SSE_SetZero(), AVX_Multiply(a, b)), c);
+        return AVX_Add(AVX_Subtract(AVX_SetZero(), AVX_Multiply(a, b)), c);
 #endif
     }
 
