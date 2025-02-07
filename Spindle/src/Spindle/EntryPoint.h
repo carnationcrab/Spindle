@@ -1,4 +1,5 @@
 #pragma once
+#define _USE_MATH_DEFINES
 
 // testing framework
 #include "Test/SpindleTest.h"
@@ -11,6 +12,11 @@
 #include "Test/MatrixTests.cpp"
 #include "Test/QuaternionTests.cpp"
 #include "Test/LineTests.cpp"
+#include "Test/LineSegmentTests.cpp"
+#include "Test/RayTests.cpp"
+#include "Test/SphereTests.cpp"
+#include "Test/PlaneTests.cpp"
+#include "Test/AABBTests.cpp"
 
 #ifdef SPINDLE_PLATFORM_WINDOWS
 

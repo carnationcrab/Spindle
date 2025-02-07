@@ -38,6 +38,14 @@ namespace Spindle {
         *  operator overloads *
         **********************/
 
+        Point operator+(const Point& other) const noexcept {
+            T result[Dimension];
+            for (size_t i = 0; i < Dimension; ++i) {
+                result[i] = coordinates[i] + other.coordinates[i];
+            }
+            return Point(result);
+        }
+
         Point operator+(const Vector<T, Dimension>& vec) const {
             T result[Dimension];
             for (size_t i = 0; i < Dimension; ++i) {
@@ -46,12 +54,31 @@ namespace Spindle {
             return Point(result);
         }
 
+        // adds vector and point together
+        template <typename T, size_t Dimension>
+        Point<T, Dimension> operator+(const Vector<T, Dimension>& vec) const {
+            Point<T, Dimension> result;
+            for (size_t i = 0; i < Dimension; ++i) {
+                result.coordinates[i] = coordinates[i] + vec[i];
+            }
+            return result;
+        }
+
+
         Vector<T, Dimension> operator-(const Point& other) const {
             T result[Dimension];
             for (size_t i = 0; i < Dimension; ++i) {
                 result[i] = coordinates[i] - other.coordinates[i];
             }
             return Vector<T, Dimension>(result);
+        }
+
+        Point operator*(T scalar) const noexcept {
+            T result[Dimension];
+            for (size_t i = 0; i < Dimension; ++i) {
+                result[i] = coordinates[i] * scalar;
+            }
+            return Point(result);
         }
 
         bool operator==(const Point& other) const {
@@ -95,7 +122,23 @@ namespace Spindle {
             return Point(result);
         }
 
-        std::string ToString() const {
+        T magnitude() const noexcept {
+            T sum = T();
+            for (size_t i = 0; i < Dimension; ++i) {
+                sum += coordinates[i] * coordinates[i];
+            }
+            return std::sqrt(sum);
+        }
+
+        T magnitudeSquared() const noexcept {
+            T sum = T();
+            for (size_t i = 0; i < Dimension; ++i) {
+                sum += coordinates[i] * coordinates[i];
+            }
+            return sum;
+        }
+
+        std::string toString() const {
             std::string result = "(";
             for (size_t i = 0; i < Dimension; ++i) {
                   result += std::to_string(coordinates[i]);
@@ -163,6 +206,37 @@ namespace Spindle {
 #endif
         }
 
+        Point operator+(const Point& other) const noexcept {
+#ifdef USE_AVX
+            __m256 p1 = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 p2 = AVX_Set(other.x, other.y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Add(p1, p2);
+            return Point(AVX_GetX(result), AVX_GetY(result));
+#elif defined(USE_SSE)
+            __m128 p1 = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128 p2 = SSE_Set(other.x, other.y, 0.0f, 0.0f);
+            __m128 result = SSE_Add(p1, p2);
+            return Point(SSE_GetX(result), SSE_GetY(result));
+#else
+            return Point(x + other.x, y + other.y);
+#endif
+        }
+
+        Point operator*(float scalar) const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 s = AVX_Set(scalar);
+            __m256 result = AVX_Multiply(p, s);
+            return Point(AVX_GetX(result), AVX_GetY(result));
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, 0.0f, 0.0f);
+            __m128 s = SSE_Set(scalar);
+            __m128 result = SSE_Multiply(p, s);
+            return Point(SSE_GetX(result), SSE_GetY(result));
+#else
+            return Point(x * scalar, y * scalar);
+#endif
+        }
 
         bool operator==(const Point& other) const noexcept {
 #ifdef USE_AVX
@@ -267,6 +341,34 @@ namespace Spindle {
 #endif
         }
 
+        float magnitude() const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, 0.0f, 0.0f);
+            return std::sqrt(AVX_Dot(p, p));
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, 0.0f, 0.0f);
+            return std::sqrt(SSE_Dot(p, p));
+#else
+            return std::sqrt(x * x + y * y);
+#endif
+        }
+
+        float magnitudeSquared() const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, 0.0f, 0.0f);
+            return AVX_Dot(p, p);
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, 0.0f, 0.0f);
+            return SSE_Dot(p, p);
+#else
+            return x * x + y * y;
+#endif
+        }
+
+        /**********************
+        *      utilities      *
+        **********************/
+
         Point setPoint(__m256 result) const noexcept {
             return Point(AVX_GetX(result), AVX_GetY(result));
         }
@@ -275,7 +377,7 @@ namespace Spindle {
             return Point(SSE_GetX(result), SSE_GetY(result));
         }
 
-        std::string ToString() const {
+        std::string toString() const {
             return "(" + std::to_string(x) + 
                    ", " + std::to_string(y) + 
                                           ")";
@@ -338,6 +440,37 @@ namespace Spindle {
 #endif
         }
 
+        Point operator+(const Point& other) const noexcept {
+#ifdef USE_AVX
+            __m256 p1 = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 p2 = AVX_Set(other.x, other.y, other.z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 result = AVX_Add(p1, p2);
+            return Point(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+#elif defined(USE_SSE)
+            __m128 p1 = SSE_Set(x, y, z, 0.0f);
+            __m128 p2 = SSE_Set(other.x, other.y, other.z, 0.0f);
+            __m128 result = SSE_Add(p1, p2);
+            return Point(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
+#else
+            return Point(x + other.x, y + other.y, z + other.z);
+#endif
+        }
+
+        Point operator*(float scalar) const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            __m256 s = AVX_Set(scalar);
+            __m256 result = AVX_Multiply(p, s);
+            return Point(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, z, 0.0f);
+            __m128 s = SSE_Set(scalar);
+            __m128 result = SSE_Multiply(p, s);
+            return Point(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
+#else
+            return Point(x * scalar, y * scalar, z * scalar);
+#endif
+        }
 
         bool operator==(const Point& other) const noexcept {
 #ifdef USE_AVX
@@ -455,6 +588,34 @@ namespace Spindle {
 #endif
         }
 
+        float magnitude() const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, z, 0.0f);
+            return std::sqrt(AVX_Dot(p, p));
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, z, 0.0f);
+            return std::sqrt(SSE_Dot(p, p));
+#else
+            return std::sqrt(x * x + y * y + z * z);
+#endif
+        }
+
+        float magnitudeSquared() const noexcept {
+#ifdef USE_AVX
+            __m256 p = AVX_Set(x, y, z, 0.0f);
+            return AVX_Dot(p, p);
+#elif defined(USE_SSE)
+            __m128 p = SSE_Set(x, y, z, 0.0f);
+            return SSE_Dot(p, p);
+#else
+            return x * x + y * y + z * z;
+#endif
+        }
+
+        /**********************
+        *      utilities      *
+        **********************/
+
         Point setPoint(__m256 result) const noexcept {
             return Point(AVX_GetX(result), AVX_GetY(result), AVX_GetZ(result));
         }
@@ -463,7 +624,7 @@ namespace Spindle {
             return Point(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
         }
 
-        std::string ToString() const {
+        std::string toString() const {
             return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
         }
     };

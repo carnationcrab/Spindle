@@ -16,6 +16,11 @@
 #define USE_SCALAR
 #endif
 
+/***********************
+*                      *
+*      CONSTANTS       *
+*                      *
+***********************/
 
 // floating point comparisons
 constexpr float SMALL_EPSILON = 1e-8;
@@ -24,7 +29,10 @@ constexpr float MEDIUM_EPSILON = 1e-6;
 // low precision
 constexpr float LARGE_EPSILON = 1e-3;
 
-
+#define _USE_MATH_DEFINES
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 ///////////////////////////////////////////////////////////
 

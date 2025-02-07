@@ -110,7 +110,7 @@ namespace Spindle {
             return Vector(result);
         }
 
-        std::string ToString() const {
+        std::string toString() const {
             std::string result = "(";
             for (size_t i = 0; i < Dimension; ++i) {
                 result += std::to_string(coordinates[i]);
@@ -299,7 +299,7 @@ namespace Spindle {
             return Vector(SSE_GetX(result), SSE_GetY(result));
         }
 
-        std::string ToString() const noexcept {
+        std::string toString() const noexcept {
             return "(" + std::to_string(x) + ", " + std::to_string(y) + ")";
         }
         };
@@ -515,7 +515,7 @@ namespace Spindle {
                 return Vector(SSE_GetX(result), SSE_GetY(result), SSE_GetZ(result));
             }
 
-            std::string ToString() const noexcept {
+            std::string toString() const noexcept {
                 return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
             }
         };
