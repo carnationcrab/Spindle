@@ -16,6 +16,7 @@
 #include "Test/RayTests.cpp"
 #include "Test/SphereTests.cpp"
 #include "Test/PlaneTests.cpp"
+#include "Test/AABBTests.cpp"
 
 #ifdef SPINDLE_PLATFORM_WINDOWS
 
