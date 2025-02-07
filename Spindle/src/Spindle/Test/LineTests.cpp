@@ -60,5 +60,5 @@ TEST_CASE(Line_ToString) {
     Line<float, 3> line(point, direction);
 
     std::string expected = "Line(point: (1.000000, 2.000000, 3.000000), Direction: (1.000000, 0.000000, 0.000000))";
-    SpindleTest::assertEqual(line.ToString(), expected, "ToString should produce the correct string representation of the line");
+    SpindleTest::assertEqual(line.toString(), expected, "toString should produce the correct string representation of the line");
 }
